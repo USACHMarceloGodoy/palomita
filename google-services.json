@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44291081029",
+    "project_id": "palomita-5587e",
+    "storage_bucket": "palomita-5587e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44291081029:android:dc53c5b80726bdb394742c",
+        "android_client_info": {
+          "package_name": "cl.palomita.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH28rm5UnUHoSZ-qFZSKN9NT1p2KA2FRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

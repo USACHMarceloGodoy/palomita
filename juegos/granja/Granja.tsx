@@ -3,7 +3,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import Svg, { Path, Rect, Ellipse, Circle } from 'react-native-svg';
-import { Figura, type Forma } from '@/components/Figuras';
+import { COLORES_PERSONAJE, Figura, type Forma } from '@/components/Figuras';
 import { Texto } from '@/components/Texto';
 import { crecimiento, diasSinVisita, granja, hechoHoy, interactuar, varianteFlor } from '@/lib/juegos';
 import { colores, radios } from '@/lib/tema';
@@ -73,7 +73,7 @@ function Animal({ e, onListo }: { e: EntidadGranja; onListo: () => void }) {
         {sprite(e.entidad as 'vaca' | 'cerdo' | 'gato') ? (
           <Image source={sprite(e.entidad as 'vaca' | 'cerdo' | 'gato')!} style={{ width: 64, height: 64 }} contentFit="contain" />
         ) : (
-          <Figura forma={forma} c1={colores.crema} c2={colores.carbon} size={64} />
+          <Figura forma={forma} c1={COLORES_PERSONAJE[forma]?.[0] ?? colores.crema} c2={COLORES_PERSONAJE[forma]?.[1] ?? colores.carbon} size={64} />
         )}
         {triste && !listo ? (
           <View style={estilos.corazonVacio}><Figura forma="corazon" c1={colores.rosaClaro} c2={colores.rosaClaro} size={18} /></View>
@@ -130,7 +130,7 @@ function AnimalGrande({
       {sprite(e.entidad as 'vaca' | 'cerdo' | 'gato') ? (
         <Image source={sprite(e.entidad as 'vaca' | 'cerdo' | 'gato')!} style={{ width: 150, height: 150 }} contentFit="contain" />
       ) : (
-        <Figura forma={forma} c1={colores.crema} c2={colores.carbon} size={150} />
+        <Figura forma={forma} c1={COLORES_PERSONAJE[forma]?.[0] ?? colores.crema} c2={COLORES_PERSONAJE[forma]?.[1] ?? colores.carbon} size={150} />
       )}
     </Animated.View>
   );

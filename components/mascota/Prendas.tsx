@@ -1,0 +1,183 @@
+// Ropa y accesorios equipables. Cada prenda es un dibujo vectorial en el mismo
+// lienzo 0-120 que MascotaVirtual, con slot fijo y colores por prop: un mismo
+// gorro en tres colores es el mismo dibujo, no tres assets.
+import { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
+import type { Especie, SlotPrenda } from '@/lib/mascota-virtual/tipos';
+
+const TRAZO = '#4A3B45';
+
+/** Ancla por especie: la cabeza del ratón es un poco más chica y baja. */
+export const ANCLA: Record<Especie, Partial<Record<SlotPrenda, { dx?: number; dy?: number }>>> = {
+  paloma: {},
+  gato: {},
+  perro: {},
+  oso: { cabeza: { dy: -2 } },
+  cerdito: {},
+  raton: { cabeza: { dy: 4 }, cara: { dy: 2 } },
+  vaca: { cabeza: { dy: -4 } },
+};
+
+export function dibujoPrenda(dibujo: string, c1: string, c2: string) {
+  switch (dibujo) {
+    // ---------------- cabeza ----------------
+    case 'sombrero_paja':
+      return (
+        <G>
+          <Ellipse cx={60} cy={26} rx={46} ry={11} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M32 24c0-16 8-26 28-26s28 10 28 26" fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={31} y={14} width={58} height={8} fill={c2} />
+        </G>
+      );
+    case 'sombrero_copa':
+      return (
+        <G>
+          <Ellipse cx={60} cy={27} rx={40} ry={8} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={36} y={-10} width={48} height={38} rx={4} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={36} y={18} width={48} height={7} fill={c2} />
+        </G>
+      );
+    case 'corona':
+      return (
+        <G>
+          <Path d="M34 28l-4-24 14 12 16-18 16 18 14-12-4 24z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Circle cx={44} cy={20} r={3.5} fill={c2} />
+          <Circle cx={60} cy={16} r={4} fill={c2} />
+          <Circle cx={76} cy={20} r={3.5} fill={c2} />
+        </G>
+      );
+    case 'lazo':
+      return (
+        <G transform="translate(28 6)">
+          <Path d="M18 12L2 4c-2-1-4 .5-4 3v10c0 2.5 2 4 4 3l16-8z" fill={c1} stroke={TRAZO} strokeWidth={2} strokeLinejoin="round" />
+          <Path d="M22 12l16-8c2-1 4 .5 4 3v10c0 2.5-2 4-4 3l-16-8z" fill={c1} stroke={TRAZO} strokeWidth={2} strokeLinejoin="round" />
+          <Ellipse cx={20} cy={12} rx={5} ry={6} fill={c2} stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
+    case 'gorro_lana':
+      return (
+        <G>
+          <Path d="M20 30c0-24 18-32 40-32s40 8 40 32z" fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={16} y={24} width={88} height={12} rx={6} fill={c2} stroke={TRAZO} strokeWidth={2.5} />
+          <Circle cx={60} cy={-2} r={8} fill={c2} stroke={TRAZO} strokeWidth={2.5} />
+        </G>
+      );
+    case 'gorra':
+      return (
+        <G>
+          <Path d="M22 30c0-20 16-30 38-30s38 10 38 30z" fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M58 30h50c4 0 6 3 6 6s-3 5-8 5H58z" fill={c2} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Circle cx={60} cy={2} r={4} fill={c2} />
+        </G>
+      );
+    case 'orejas_conejo':
+      return (
+        <G>
+          <Ellipse cx={42} cy={2} rx={9} ry={26} fill={c1} stroke={TRAZO} strokeWidth={2.5} transform="rotate(-12 42 2)" />
+          <Ellipse cx={78} cy={2} rx={9} ry={26} fill={c1} stroke={TRAZO} strokeWidth={2.5} transform="rotate(12 78 2)" />
+          <Ellipse cx={42} cy={4} rx={4} ry={18} fill={c2} transform="rotate(-12 42 4)" />
+          <Ellipse cx={78} cy={4} rx={4} ry={18} fill={c2} transform="rotate(12 78 4)" />
+          <Path d="M32 30c10-6 46-6 56 0" fill="none" stroke={TRAZO} strokeWidth={2.5} />
+        </G>
+      );
+    case 'gorro_navidad':
+      return (
+        <G>
+          <Path d="M24 30C28 8 48-10 92-8c-4 8-4 16 0 20-16-2-30 6-36 18z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Circle cx={94} cy={4} r={8} fill={c2} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={18} y={24} width={84} height={12} rx={6} fill={c2} stroke={TRAZO} strokeWidth={2.5} />
+        </G>
+      );
+    case 'sombrero_bruja':
+      return (
+        <G>
+          <Ellipse cx={60} cy={28} rx={48} ry={9} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M34 28C40 6 52-14 70-30c-4 20 6 40 18 58z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M36 22h46" stroke={c2} strokeWidth={5} />
+        </G>
+      );
+
+    // ---------------- cara ----------------
+    case 'lentes_sol':
+      return (
+        <G>
+          <Rect x={26} y={48} width={28} height={18} rx={8} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={66} y={48} width={28} height={18} rx={8} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Line x1={54} y1={54} x2={66} y2={54} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M32 54c4-3 8-3 12 0M72 54c4-3 8-3 12 0" stroke={c2} strokeWidth={2} strokeLinecap="round" fill="none" opacity={0.7} />
+        </G>
+      );
+    case 'lentes_redondos':
+      return (
+        <G>
+          <Circle cx={41} cy={57} r={12} fill={c2} fillOpacity={0.35} stroke={c1} strokeWidth={3} />
+          <Circle cx={79} cy={57} r={12} fill={c2} fillOpacity={0.35} stroke={c1} strokeWidth={3} />
+          <Line x1={53} y1={57} x2={67} y2={57} stroke={c1} strokeWidth={3} />
+        </G>
+      );
+
+    // ---------------- cuello ----------------
+    case 'bufanda':
+      return (
+        <G>
+          <Rect x={26} y={90} width={68} height={16} rx={8} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M74 100l4 22h12l-4-22z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M36 98h48M78 110h10" stroke={c2} strokeWidth={2.5} strokeLinecap="round" />
+        </G>
+      );
+    case 'panuelo':
+      return (
+        <G>
+          <Path d="M28 92h64l-32 26z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Circle cx={48} cy={100} r={2.5} fill={c2} />
+          <Circle cx={64} cy={104} r={2.5} fill={c2} />
+          <Circle cx={72} cy={96} r={2.5} fill={c2} />
+        </G>
+      );
+    case 'collar':
+      return (
+        <G>
+          <Path d="M32 92c6 12 16 18 28 18s22-6 28-18" fill="none" stroke={c2} strokeWidth={2} />
+          {[36, 44, 52, 60, 68, 76, 84].map((x, i) => (
+            <Circle key={x} cx={x} cy={92 + [4, 10, 14, 16, 14, 10, 4][i]} r={4} fill={c1} stroke={TRAZO} strokeWidth={1.5} />
+          ))}
+        </G>
+      );
+
+    // ---------------- cuerpo ----------------
+    case 'vestido':
+      return (
+        <G>
+          <Path d="M40 96h40l12 24H28z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M46 104h28M42 112h36" stroke={c2} strokeWidth={2.5} strokeLinecap="round" />
+          <Circle cx={60} cy={99} r={3} fill={c2} />
+        </G>
+      );
+    case 'chaleco':
+      return (
+        <G>
+          <Path d="M36 96h48l4 24H32z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M60 96v24" stroke={c2} strokeWidth={3} />
+          <Circle cx={60} cy={104} r={2} fill={TRAZO} />
+          <Circle cx={60} cy={112} r={2} fill={TRAZO} />
+        </G>
+      );
+    case 'capa':
+      return (
+        <G>
+          <Path d="M30 96c-6 10-8 18-6 26h72c2-8 0-16-6-26z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M40 94h40" stroke={c2} strokeWidth={5} strokeLinecap="round" />
+          <Path d="M60 100l3 6-3 6-3-6z" fill={c2} />
+        </G>
+      );
+    default:
+      return null;
+  }
+}
+
+/** Región del lienzo que ocupa cada slot, para dibujar la prenda sola (tienda, armario). */
+export const REGION_SLOT: Record<SlotPrenda, string> = {
+  cabeza: '8 -34 104 74',
+  cara: '20 40 80 34',
+  cuello: '20 84 80 42',
+  cuerpo: '20 86 80 40',
+};

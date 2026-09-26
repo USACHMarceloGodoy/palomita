@@ -17,12 +17,15 @@ type Pestana = { id: string; titulo: string; categorias: CategoriaItem[] };
 const PESTANAS: Pestana[] = [
   { id: 'comida', titulo: 'Comida', categorias: ['comida'] },
   { id: 'ropa', titulo: 'Ropa', categorias: ['ropa'] },
-  { id: 'casa', titulo: 'Casa', categorias: ['mueble', 'pared', 'suelo'] },
+  { id: 'muebles', titulo: 'Muebles', categorias: ['mueble'] },
+  { id: 'casa', titulo: 'Paredes y pisos', categorias: ['pared', 'suelo'] },
+  { id: 'piezas', titulo: 'Habitaciones', categorias: ['habitacion'] },
   { id: 'cocina', titulo: 'Ingredientes', categorias: ['ingrediente'] },
   { id: 'arte', titulo: 'Arte', categorias: ['arte'] },
-  { id: 'pesca', titulo: 'Pesca', categorias: ['cebo'] },
+  { id: 'pesca', titulo: 'Pesca', categorias: ['cana', 'aparejo', 'cebo'] },
 ];
-const UNICOS: CategoriaItem[] = ['ropa', 'mueble', 'pared', 'suelo', 'arte'];
+// Se compran una sola vez (los muebles no: se pueden tener varios).
+const UNICOS: CategoriaItem[] = ['ropa', 'pared', 'suelo', 'arte', 'habitacion', 'cana', 'aparejo'];
 
 export default function Tienda() {
   const { rol, saldo, cantidad, recargar } = useMascota();

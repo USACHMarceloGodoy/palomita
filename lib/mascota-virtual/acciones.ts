@@ -87,7 +87,7 @@ export function catalogoTienda(categoria: Item['categoria']): Item[] {
 export function catalogoTemporada(): Item[] {
   const t = temporada();
   if (!t) return [];
-  return itemsDe('ropa').concat(itemsDe('mueble'), itemsDe('pared')).filter((i) => i.temporada === t);
+  return itemsDe('ropa').concat(itemsDe('mueble'), itemsDe('pared'), itemsDe('suelo')).filter((i) => i.temporada === t);
 }
 
 export async function comprar(rol: Rol, itemId: string): Promise<boolean> {

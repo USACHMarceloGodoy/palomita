@@ -3,7 +3,7 @@
 import { supabase, supabaseConfigurado } from '../supabase';
 import { leerCache, guardarCache } from '../cache';
 import type { Rol } from '../sesion';
-import type { Donacion, ItemInventario, Mascota, Necesidades, Puntaje, Regalo } from './tipos';
+import type { Decoracion, Donacion, ItemInventario, Mascota, Necesidades, Puntaje, Regalo } from './tipos';
 
 const demo = !supabaseConfigurado;
 
@@ -39,20 +39,45 @@ async function guardarDemo<T>(tabla: string, lista: T[]) {
 // --------------------------------------------------------------------------
 const PAREJA_DEMO: Mascota = {
   rol: 'autor', especie: 'perro', orejas: 'caidas', hocico: 'trufa', ojos: 'grandes', boca: 'lengua', color_pelaje: '#C8ECD9', color_secundario: '#FFFFFF',
-  nombre: 'Mote', look: { cuello: 'panuelo' }, decoracion: { pared: 'pared_cielo', suelo: 'suelo_madera', muebles: ['cama', 'planta'] },
+  nombre: 'Mote', look: { cuello: 'panuelo' },
+  decoracion: { habitaciones: [
+    { tipo: 'sala', pared: 'pared_cielo', suelo: 'suelo_madera', muebles: [{ id: 'cama_azul', x: 0.22, y: 0.82 }, { id: 'planta', x: 0.86, y: 0.78 }, { id: 'cuadro', x: 0.55, y: 0.28 }] },
+    { tipo: 'jardin', pared: 'pared_cielo', suelo: 'suelo_pasto', muebles: [{ id: 'columpio', x: 0.3, y: 0.7 }, { id: 'planta_flor', x: 0.8, y: 0.8 }] },
+  ] },
   creado_en: '2026-01-01T00:00:00Z', actualizado_en: '2026-01-01T00:00:00Z',
 };
+
+export const DECORACION_INICIAL: Decoracion = {
+  habitaciones: [{ tipo: 'sala', pared: 'pared_rosa', suelo: 'suelo_madera', muebles: [{ id: 'cama', x: 0.25, y: 0.82 }] }],
+};
+
+/** La casa empezó siendo una sola habitación ({pared, suelo, muebles: string[]}); se convierte al vuelo. */
+export function normalizarDecoracion(d: unknown): Decoracion {
+  const v = d as { habitaciones?: Decoracion['habitaciones']; pared?: string; suelo?: string; muebles?: unknown[] } | null;
+  if (v?.habitaciones?.length) return { habitaciones: v.habitaciones };
+  if (v?.pared) {
+    const muebles = (v.muebles ?? []).map((m, i) => (typeof m === 'string'
+      ? { id: m, x: 0.2 + (i % 4) * 0.2, y: i < 4 ? 0.8 : 0.35 }
+      : (m as Decoracion['habitaciones'][0]['muebles'][0])));
+    return { habitaciones: [{ tipo: 'sala', pared: v.pared, suelo: v.suelo ?? 'suelo_madera', muebles }] };
+  }
+  return DECORACION_INICIAL;
+}
+
+function completar(m: Mascota): Mascota {
+  // Ojos, boca (0016) y habitaciones llegaron después: una fila vieja se completa al leer.
+  return { ...m, ojos: m.ojos ?? 'redondos', boca: m.boca ?? 'sonrisa', decoracion: normalizarDecoracion(m.decoracion) };
+}
 
 export async function mascotaDe(rol: Rol): Promise<Mascota | null> {
   if (demo) {
     const l = await listaDemo<Mascota>('mascota');
-    return l.find((m) => m.rol === rol) ?? (rol === 'autor' ? PAREJA_DEMO : null);
+    const m = l.find((x) => x.rol === rol) ?? (rol === 'autor' ? PAREJA_DEMO : null);
+    return m ? completar(m) : null;
   }
   const { data } = await supabase.from('mascota').select('*').eq('rol', rol).maybeSingle();
   if (!data) return null;
-  // Ojos y boca llegaron después (migración 0016): una fila vieja los trae vacíos.
-  const m = data as Mascota;
-  return { ...m, ojos: m.ojos ?? 'redondos', boca: m.boca ?? 'sonrisa' };
+  return completar(data as Mascota);
 }
 
 export async function guardarMascota(m: Omit<Mascota, 'creado_en' | 'actualizado_en'>) {

@@ -64,7 +64,15 @@ export const SLOTS: SlotPrenda[] = ['cabeza', 'cara', 'cuello', 'cuerpo'];
 /** Lo equipado: slot → id de ítem del catálogo. */
 export type Look = Partial<Record<SlotPrenda, string>>;
 
-export type Decoracion = { pared: string; suelo: string; muebles: string[] };
+export type TipoHabitacion = 'sala' | 'dormitorio' | 'cocina' | 'bano' | 'jardin' | 'terraza' | 'atico';
+export const NOMBRE_HABITACION: Record<TipoHabitacion, string> = {
+  sala: 'Sala', dormitorio: 'Dormitorio', cocina: 'Cocina', bano: 'Baño', jardin: 'Jardín', terraza: 'Terraza', atico: 'Ático',
+};
+/** Un mueble puesto en una habitación: centro en coordenadas 0-1 del lienzo. */
+export type MuebleColocado = { id: string; x: number; y: number };
+export type Habitacion = { tipo: TipoHabitacion; pared: string; suelo: string; muebles: MuebleColocado[] };
+/** La casa: varias habitaciones (la sala viene de regalo; las demás se compran). */
+export type Decoracion = { habitaciones: Habitacion[] };
 
 export type Mascota = {
   rol: Rol;
@@ -93,7 +101,8 @@ export type Necesidades = {
   afecto: number; afecto_en: string;
 };
 
-export type CategoriaItem = 'comida' | 'ropa' | 'mueble' | 'pared' | 'suelo' | 'ingrediente' | 'plato' | 'pez' | 'insecto' | 'fosil' | 'arte' | 'cebo' | 'trofeo';
+export type CategoriaItem = 'comida' | 'ropa' | 'mueble' | 'pared' | 'suelo' | 'habitacion' | 'ingrediente' | 'plato' | 'pez' | 'insecto' | 'fosil' | 'arte' | 'cebo' | 'cana' | 'aparejo' | 'trofeo';
+export type ComportamientoPez = 'suave' | 'fondo' | 'dardo' | 'escurridizo' | 'mixto';
 export type CategoriaMuseo = 'pez' | 'insecto' | 'fosil' | 'arte';
 
 export type Item = {
@@ -110,9 +119,18 @@ export type Item = {
   rareza?: 1 | 2 | 3 | 4;    // peces/insectos/fósiles
   temporada?: Temporada;     // solo disponible durante ese evento
   descripcion?: string;
+  tam?: number;              // muebles: ancho como fracción del lienzo (0.22 por defecto)
+  comportamiento?: ComportamientoPez;  // peces: cómo se mueve en el minijuego
+  dificultad?: 1 | 2 | 3 | 4 | 5;      // peces: velocidad y brusquedad
+  habitacion?: TipoHabitacion;         // ítems de categoría 'habitacion'
+  bonus?: { barra?: number; drenaje?: number; rebote?: boolean };  // cañas y aparejos
 };
 
-export type Receta = { id: string; nombre: string; ingredientes: string[]; resultado: string };
+/** Un paso de receta, estilo Cooking Mama: una mecánica concreta con tiempo. */
+export type TipoPaso = 'cortar' | 'picar' | 'mezclar' | 'voltear' | 'fuego' | 'verter' | 'emplatar';
+export type Paso = { tipo: TipoPaso; texto: string; ingrediente?: string; n?: number; tiempo?: number };
+export type Receta = { id: string; nombre: string; ingredientes: string[]; resultado: string; pasos: Paso[] };
+export type Medalla = 'oro' | 'plata' | 'bronce';
 
 export type ItemInventario = { rol: Rol; item_id: string; cantidad: number; obtenido_en: string };
 export type Donacion = { rol: Rol; item_id: string; donado_en: string };

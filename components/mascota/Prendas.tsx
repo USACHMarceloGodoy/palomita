@@ -169,6 +169,137 @@ export function dibujoPrenda(dibujo: string, c1: string, c2: string) {
           <Path d="M60 100l3 6-3 6-3-6z" fill={c2} />
         </G>
       );
+
+    case 'boina':
+      return (
+        <G>
+          <Path d="M22 28c-2-18 14-30 40-28 24 0 36 12 34 28z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M20 30c14-6 66-6 80 0" fill="none" stroke={c2} strokeWidth={5} strokeLinecap="round" />
+          <Circle cx={62} cy={-2} r={4} fill={c2} stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
+    case 'diadema':
+      return (
+        <G>
+          <Path d="M18 34C26 14 44 4 60 4s34 10 42 30" fill="none" stroke={c1} strokeWidth={6} strokeLinecap="round" />
+          <G transform="translate(84 10)">
+            {[0, 72, 144, 216, 288].map((a) => <Ellipse key={a} cx={0} cy={-8} rx={4.5} ry={7} fill={c2} stroke={TRAZO} strokeWidth={1.5} transform={`rotate(${a})`} />)}
+            <Circle cx={0} cy={0} r={4} fill="#FFFFFF" stroke={TRAZO} strokeWidth={1.5} />
+          </G>
+        </G>
+      );
+    case 'audifonos':
+      return (
+        <G>
+          <Path d="M14 56C14 20 34 2 60 2s46 18 46 54" fill="none" stroke={c1} strokeWidth={7} strokeLinecap="round" />
+          <Rect x={4} y={46} width={20} height={30} rx={9} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Rect x={96} y={46} width={20} height={30} rx={9} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Circle cx={14} cy={61} r={5} fill={c2} /><Circle cx={106} cy={61} r={5} fill={c2} />
+        </G>
+      );
+    case 'sombrero_vaquero':
+      return (
+        <G>
+          <Path d="M4 30c10 10 102 10 112 0-8-4-22-6-30-6H34c-8 0-22 2-30 6z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M34 24c-2-20 8-30 26-30s28 10 26 30z" fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M34 22h52" stroke={c2} strokeWidth={5} />
+          <Path d="M48-2c4-4 8-4 12 0 4-4 8-4 12 0" fill="none" stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
+    case 'casco':
+      return (
+        <G>
+          <Path d="M18 30c0-26 18-38 42-38s42 12 42 38z" fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+          <Path d="M32 24c4-14 14-22 28-22s24 8 28 22M60 2v22" stroke={c2} strokeWidth={4} fill="none" strokeLinecap="round" />
+          <Rect x={16} y={26} width={88} height={8} rx={4} fill={c2} stroke={TRAZO} strokeWidth={2.5} />
+        </G>
+      );
+    case 'cuernitos':
+      return (
+        <G>
+          <Path d="M36 30c-10-6-14-16-10-28 8 4 14 14 14 26z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M84 30c10-6 14-16 10-28-8 4-14 14-14 26z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M30 12l4 8M90 12l-4 8" stroke={c2} strokeWidth={2.5} strokeLinecap="round" />
+        </G>
+      );
+    case 'antifaz':
+      return (
+        <G>
+          <Path d="M20 50c10-8 22-8 30-2 3 2 7 2 10 0 8-6 20-6 30 2 2 12-6 22-16 22-8 0-12-6-16-6h-6c-4 0-8 6-16 6-10 0-18-10-16-22z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Ellipse cx={42} cy={58} rx={9} ry={6} fill={c2} opacity={0.9} /><Ellipse cx={78} cy={58} rx={9} ry={6} fill={c2} opacity={0.9} />
+        </G>
+      );
+    case 'monoculo':
+      return (
+        <G>
+          <Circle cx={79} cy={57} r={13} fill={c2} fillOpacity={0.3} stroke={c1} strokeWidth={3.5} />
+          <Path d="M90 66c6 8 8 18 6 30" fill="none" stroke={TRAZO} strokeWidth={1.8} />
+        </G>
+      );
+    case 'pajarita':
+      return (
+        <G transform="translate(60 98)">
+          <Path d="M-4 0l-22-12c-3-1.5-6 .5-6 4v16c0 3.5 3 5.5 6 4L-4 0zM4 0l22-12c3-1.5 6 .5 6 4v16c0 3.5-3 5.5-6 4L4 0z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Rect x={-6} y={-7} width={12} height={14} rx={4} fill={c2} stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
+    case 'corbata':
+      return (
+        <G>
+          <Path d="M52 92h16l-4 6 6 18-10 8-10-8 6-18z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M56 104l8 4M55 112l10 4" stroke={c2} strokeWidth={2.5} strokeLinecap="round" />
+        </G>
+      );
+    case 'pijama':
+      return (
+        <G>
+          <Path d="M32 96h56l4 24H28z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M60 96v24" stroke={c2} strokeWidth={2} />
+          {[[42, 104], [52, 112], [70, 104], [78, 112], [60, 108]].map(([x, y]) => <Circle key={`${x}${y}`} cx={x} cy={y} r={2.6} fill={c2} />)}
+        </G>
+      );
+    case 'chaqueta':
+      return (
+        <G>
+          <Path d="M30 96h60l6 24H24z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M48 96l12 10 12-10" fill="none" stroke={c2} strokeWidth={3} strokeLinejoin="round" />
+          <Path d="M60 106v14" stroke={c2} strokeWidth={2} />
+          <Rect x={24} y={100} width={10} height={20} rx={3} fill={c1} stroke={TRAZO} strokeWidth={2.5} /><Rect x={86} y={100} width={10} height={20} rx={3} fill={c1} stroke={TRAZO} strokeWidth={2.5} />
+        </G>
+      );
+    case 'delantal':
+      return (
+        <G>
+          <Path d="M40 92h40v28H40z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M40 100c-4-2-6-6-6-10M80 100c4-2 6-6 6-10" fill="none" stroke={TRAZO} strokeWidth={2} />
+          <Rect x={50} y={104} width={20} height={12} rx={3} fill={c2} stroke={TRAZO} strokeWidth={1.8} />
+        </G>
+      );
+    case 'tutu':
+      return (
+        <G>
+          <Path d="M36 98c-4 6-10 12-16 14 14 2 30 4 40 4s26-2 40-4c-6-2-12-8-16-14z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M28 108c10 3 54 3 64 0" fill="none" stroke={c2} strokeWidth={2} />
+          <Rect x={40} y={92} width={40} height={8} rx={4} fill={c2} stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
+    case 'alas':
+      return (
+        <G>
+          <Path d="M28 92c-16-10-30-6-30 8 0 10 10 18 26 18z" fill={c1} fillOpacity={0.85} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M92 92c16-10 30-6 30 8 0 10-10 18-26 18z" fill={c1} fillOpacity={0.85} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M10 100c6 0 12 4 14 10M110 100c-6 0-12 4-14 10" fill="none" stroke={c2} strokeWidth={2.5} strokeLinecap="round" />
+        </G>
+      );
+    case 'mochila':
+      return (
+        <G>
+          <Path d="M34 96c-2-4-6-6-10-6v30h12z" fill={c2} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M86 96c2-4 6-6 10-6v30H84z" fill={c2} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M36 96h48v24H36z" fill={c1} stroke={TRAZO} strokeWidth={2.5} strokeLinejoin="round" />
+          <Rect x={48} y={104} width={24} height={10} rx={3} fill={c2} stroke={TRAZO} strokeWidth={2} />
+        </G>
+      );
     default:
       return null;
   }

@@ -10,7 +10,7 @@ import { Texto } from '@/components/Texto';
 import { BotonKawaii } from '@/components/BotonKawaii';
 import { Cabecera } from '@/components/mascota/Cabecera';
 import { MascotaVirtual } from '@/components/mascota/MascotaVirtual';
-import { agregarItem, guardarMascota, guardarNecesidades, mascotaDe, necesidadesDe, rolActual } from '@/lib/mascota-virtual/datos';
+import { agregarItem, DECORACION_INICIAL, guardarMascota, guardarNecesidades, mascotaDe, necesidadesDe, rolActual } from '@/lib/mascota-virtual/datos';
 import { BOCAS, ESPECIES, HOCICOS, OJOS, OREJAS, PALETA_PELAJE, PALETA_SECUNDARIA, type Boca, type Especie, type Hocico, type Mascota, type Ojos, type Orejas } from '@/lib/mascota-virtual/tipos';
 import { colores, fuentes, radios } from '@/lib/tema';
 
@@ -51,7 +51,7 @@ export default function Personalizar() {
       await guardarMascota({
         rol, especie, orejas, hocico, ojos, boca, color_pelaje: c1, color_secundario: c2, nombre: n,
         look: previa?.look ?? {},
-        decoracion: previa?.decoracion ?? { pared: 'pared_rosa', suelo: 'suelo_madera', muebles: ['cama'] },
+        decoracion: previa?.decoracion ?? DECORACION_INICIAL,
       });
       if (!previa) {
         // Kit de bienvenida: la mascota parte contenta y con algo que comer.
@@ -59,6 +59,8 @@ export default function Personalizar() {
         await agregarItem(rol, 'manzana', 2);
         await agregarItem(rol, 'galleta', 1);
         await agregarItem(rol, 'cebo', 1);
+        await agregarItem(rol, 'cana_bambu', 1);
+        await agregarItem(rol, 'cojin', 1);
         await agregarItem(rol, 'cama', 1);
         await agregarItem(rol, 'pared_rosa', 1);
         await agregarItem(rol, 'suelo_madera', 1);

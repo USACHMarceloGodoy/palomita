@@ -11,6 +11,7 @@ import { Particulas, type TipoParticula } from '@/components/Particulas';
 import { Barras } from '@/components/mascota/Barras';
 import { Cabecera } from '@/components/mascota/Cabecera';
 import { Habitacion } from '@/components/mascota/Habitacion';
+import { SelectorHabitacion } from '@/components/mascota/SelectorHabitacion';
 import { IconoItem, IconoUI } from '@/components/mascota/IconosMascota';
 import { MascotaVirtual } from '@/components/mascota/MascotaVirtual';
 import { acariciarVisita, alimentarVisita, regalar } from '@/lib/mascota-virtual/acciones';
@@ -30,6 +31,7 @@ export default function Visita() {
   const [elegido, setElegido] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState('');
   const [caricias, setCaricias] = useState(0);
+  const [hab, setHab] = useState(0);
 
   function celebrar(tipo: TipoParticula, texto: string) {
     setFestejo(tipo); setAviso(texto);
@@ -84,8 +86,9 @@ export default function Visita() {
       <Cabecera titulo={`Casa de ${mascota.nombre}`} saldo={saldo} subtitulo={animo.frase} />
       {aviso ? <View style={estilos.aviso}><Texto variante="cuerpoBold" style={{ color: colores.crema }}>{aviso}</Texto></View> : null}
 
+      <SelectorHabitacion habitaciones={mascota.decoracion.habitaciones} actual={Math.min(hab, mascota.decoracion.habitaciones.length - 1)} onCambiar={setHab} />
       <View style={{ alignSelf: 'center', ...sombras.rosada }}>
-        <Habitacion decoracion={mascota.decoracion} ancho={ancho}>
+        <Habitacion habitacion={mascota.decoracion.habitaciones[Math.min(hab, mascota.decoracion.habitaciones.length - 1)]} ancho={ancho}>
           <Pressable onPress={cariño} accessibilityRole="button" accessibilityLabel={`Acariciar a ${mascota.nombre}`}>
             <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} animo={animo.animo01} size={ancho * 0.42} />
           </Pressable>

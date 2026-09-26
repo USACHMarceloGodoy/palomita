@@ -20,7 +20,7 @@ herramienta de patrones propios.
 ## Arte: todo vector, nada de PNG ni emoji
 
 - `components/mascota/MascotaVirtual.tsx`: la mascota por capas en un SVG 0-120 — cuerpo, orejas
-  (6 variantes), cabeza, hocico/pico (5 variantes), rubor, ojos (parpadean), boca según ánimo, alas
+  (6 variantes), cabeza, hocico/pico (5 variantes), rubor, ojos (6 variantes, parpadean), boca (6 variantes, curva según ánimo; con pico no se dibuja), alas
   (paloma), cola (ratón), manchas (vaca) — con `c1` (pelaje) y `c2` (secundario) como props.
   7 especies: paloma, gato, perro, oso, cerdito, ratón, vaca. Geometría tomada del board
   "Variaciones de especie y color".
@@ -39,7 +39,7 @@ herramienta de patrones propios.
 
 | tabla | qué guarda |
 | --- | --- |
-| `mascota` | una fila por rol: especie, orejas, hocico, colores, nombre, `look` (jsonb), `decoracion` (jsonb) |
+| `mascota` | una fila por rol: especie, orejas, hocico, ojos, boca (0016), colores, nombre, `look` (jsonb), `decoracion` (jsonb) |
 | `mascota_necesidades` | hambre / higiene / afecto (0-100) + marca de tiempo de cada una, `avisado_en` |
 | `inventario` | `(rol, item_id) → cantidad` |
 | `museo_donaciones` | qué donó cada uno |
@@ -84,7 +84,7 @@ herramienta de patrones propios.
 
 ## Para desplegar
 
-1. Correr `supabase/migrations/0015_mascota_virtual.sql` (crea tablas, RLS, trigger y cron).
+1. Correr `supabase/migrations/0015_mascota_virtual.sql` (crea tablas, RLS, trigger y cron) y `0016_mascota_ojos_boca.sql`.
 2. `supabase functions deploy notificar --no-verify-jwt` (nuevo manejo de `regalos_mascota` y cron `mascota`).
 3. La app no necesita build nativo: es todo JS/SVG, sale por `eas update`.
 

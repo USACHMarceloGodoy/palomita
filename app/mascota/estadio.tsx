@@ -74,7 +74,7 @@ export default function Estadio() {
 
       <View style={estilos.pista}>
         <Carril nombre={mascota?.nombre ?? 'Tú'} avance={yo} fondo={colores.rosaClaro}>
-          {mascota ? <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={40} quieta /> : null}
+          {mascota ? <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={40} quieta /> : null}
         </Carril>
         {VECINOS.map((v, i) => (
           <Carril key={v.nombre} nombre={v.nombre} avance={vecinos[i]} fondo={v.fondo}>

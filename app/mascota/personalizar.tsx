@@ -11,7 +11,7 @@ import { BotonKawaii } from '@/components/BotonKawaii';
 import { Cabecera } from '@/components/mascota/Cabecera';
 import { MascotaVirtual } from '@/components/mascota/MascotaVirtual';
 import { agregarItem, guardarMascota, guardarNecesidades, mascotaDe, necesidadesDe, rolActual } from '@/lib/mascota-virtual/datos';
-import { ESPECIES, HOCICOS, OREJAS, PALETA_PELAJE, PALETA_SECUNDARIA, type Especie, type Hocico, type Mascota, type Orejas } from '@/lib/mascota-virtual/tipos';
+import { BOCAS, ESPECIES, HOCICOS, OJOS, OREJAS, PALETA_PELAJE, PALETA_SECUNDARIA, type Boca, type Especie, type Hocico, type Mascota, type Ojos, type Orejas } from '@/lib/mascota-virtual/tipos';
 import { colores, fuentes, radios } from '@/lib/tema';
 
 export default function Personalizar() {
@@ -22,6 +22,8 @@ export default function Personalizar() {
   const [especie, setEspecie] = useState<Especie>('gato');
   const [orejas, setOrejas] = useState<Orejas>('puntiagudas');
   const [hocico, setHocico] = useState<Hocico>('chico');
+  const [ojos, setOjos] = useState<Ojos>('redondos');
+  const [boca, setBoca] = useState<Boca>('sonrisa');
   const [c1, setC1] = useState(PALETA_PELAJE[0]);
   const [c2, setC2] = useState(PALETA_SECUNDARIA[0]);
   const [nombre, setNombre] = useState('');
@@ -30,7 +32,7 @@ export default function Personalizar() {
   useEffect(() => {
     rolActual().then(mascotaDe).then((m) => {
       if (!m) return;
-      setPrevia(m); setEspecie(m.especie); setOrejas(m.orejas); setHocico(m.hocico);
+      setPrevia(m); setEspecie(m.especie); setOrejas(m.orejas); setHocico(m.hocico); setOjos(m.ojos); setBoca(m.boca);
       setC1(m.color_pelaje); setC2(m.color_secundario); setNombre(m.nombre);
     }).catch(() => {});
   }, []);
@@ -47,7 +49,7 @@ export default function Personalizar() {
     try {
       const rol = await rolActual();
       await guardarMascota({
-        rol, especie, orejas, hocico, color_pelaje: c1, color_secundario: c2, nombre: n,
+        rol, especie, orejas, hocico, ojos, boca, color_pelaje: c1, color_secundario: c2, nombre: n,
         look: previa?.look ?? {},
         decoracion: previa?.decoracion ?? { pared: 'pared_rosa', suelo: 'suelo_madera', muebles: ['cama'] },
       });
@@ -74,7 +76,7 @@ export default function Personalizar() {
       <Cabecera titulo={previa ? 'Personalizar mascota' : 'Crea tu mascota'} subtitulo={previa ? 'Cambia lo que quieras; no pierde nada.' : 'Va a vivir aquí con ustedes.'} />
 
       <View style={{ alignItems: 'center', paddingVertical: 6 }}>
-        <MascotaVirtual especie={especie} orejas={orejas} hocico={hocico} c1={c1} c2={c2} look={previa?.look} size={200} />
+        <MascotaVirtual especie={especie} orejas={orejas} hocico={hocico} ojos={ojos} boca={boca} c1={c1} c2={c2} look={previa?.look} size={200} />
       </View>
 
       <Seccion titulo="Especie">
@@ -90,7 +92,7 @@ export default function Personalizar() {
           <View style={estilos.rejilla}>
             {OREJAS.map((o) => (
               <Miniatura key={o.id} activa={orejas === o.id} onPress={() => setOrejas(o.id)} etiqueta={o.nombre}>
-                <MascotaVirtual especie={especie} orejas={o.id} hocico={hocico} c1={c1} c2={c2} size={50} quieta />
+                <MascotaVirtual especie={especie} orejas={o.id} hocico={hocico} ojos={ojos} boca={boca} c1={c1} c2={c2} size={50} quieta />
               </Miniatura>
             ))}
           </View>
@@ -99,10 +101,35 @@ export default function Personalizar() {
           <View style={estilos.rejilla}>
             {HOCICOS.map((h) => (
               <Miniatura key={h.id} activa={hocico === h.id} onPress={() => setHocico(h.id)} etiqueta={h.nombre}>
-                <MascotaVirtual especie={especie} orejas={orejas} hocico={h.id} c1={c1} c2={c2} size={50} quieta />
+                <MascotaVirtual especie={especie} orejas={orejas} hocico={h.id} ojos={ojos} boca={boca} c1={c1} c2={c2} size={50} quieta />
               </Miniatura>
             ))}
           </View>
+        </Seccion>
+      </View>
+
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <Seccion titulo="Ojos" style={{ flex: 1 }}>
+          <View style={estilos.rejilla}>
+            {OJOS.map((o) => (
+              <Miniatura key={o.id} activa={ojos === o.id} onPress={() => setOjos(o.id)} etiqueta={o.nombre}>
+                <Cara especie={especie} orejas={orejas} hocico={hocico} ojos={o.id} boca={boca} c1={c1} c2={c2} />
+              </Miniatura>
+            ))}
+          </View>
+        </Seccion>
+        <Seccion titulo="Boca" style={{ flex: 1 }}>
+          {hocico === 'pico' ? (
+            <Texto variante="apoyo" style={{ fontSize: 13 }}>Con pico no lleva boca: el pico ya lo es.</Texto>
+          ) : (
+            <View style={estilos.rejilla}>
+              {BOCAS.map((b) => (
+                <Miniatura key={b.id} activa={boca === b.id} onPress={() => setBoca(b.id)} etiqueta={b.nombre}>
+                  <Cara especie={especie} orejas={orejas} hocico={hocico} ojos={ojos} boca={b.id} c1={c1} c2={c2} />
+                </Miniatura>
+              ))}
+            </View>
+          )}
         </Seccion>
       </View>
 
@@ -131,6 +158,17 @@ export default function Personalizar() {
 
       <BotonKawaii titulo={previa ? 'Guardar cambios' : 'Crear mascota'} onPress={guardar} disabled={guardando} />
     </Pantalla>
+  );
+}
+
+// Miniatura acercada a la cara, para que se note la diferencia entre ojos y bocas.
+function Cara(p: { especie: Especie; orejas: Orejas; hocico: Hocico; ojos: Ojos; boca: Boca; c1: string; c2: string }) {
+  return (
+    <View style={{ width: 52, height: 52, overflow: 'hidden', alignItems: 'center' }}>
+      <View style={{ marginTop: -30 }}>
+        <MascotaVirtual {...p} size={96} quieta />
+      </View>
+    </View>
   );
 }
 

@@ -79,7 +79,7 @@ export default function Pesca() {
           <Rect x={30} y={150} width={10} height={60} fill="#8C6239" /><Rect x={110} y={150} width={10} height={60} fill="#8C6239" />
         </Svg>
         <View style={{ position: 'absolute', left: ancho * 0.05, top: ancho * 0.06 }}>
-          {mascota ? <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={ancho * 0.3} animo={estado === 'escapo' ? 0.3 : 0.9} /> : null}
+          {mascota ? <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={ancho * 0.3} animo={estado === 'escapo' ? 0.3 : 0.9} /> : null}
         </View>
         <View style={{ position: 'absolute', left: ancho * 0.32, top: ancho * 0.12, width: 3, height: ancho * 0.5, backgroundColor: 'rgba(255,255,255,0.8)', transform: [{ rotate: '-12deg' }] }} />
         <Animated.View style={[{ position: 'absolute', left: ancho * 0.36, top: ancho * 0.56 }, estiloBoya]}>

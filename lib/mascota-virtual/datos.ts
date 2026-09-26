@@ -38,7 +38,7 @@ async function guardarDemo<T>(tabla: string, lista: T[]) {
 // Mascota
 // --------------------------------------------------------------------------
 const PAREJA_DEMO: Mascota = {
-  rol: 'autor', especie: 'perro', orejas: 'caidas', hocico: 'trufa', color_pelaje: '#C8ECD9', color_secundario: '#FFFFFF',
+  rol: 'autor', especie: 'perro', orejas: 'caidas', hocico: 'trufa', ojos: 'grandes', boca: 'lengua', color_pelaje: '#C8ECD9', color_secundario: '#FFFFFF',
   nombre: 'Mote', look: { cuello: 'panuelo' }, decoracion: { pared: 'pared_cielo', suelo: 'suelo_madera', muebles: ['cama', 'planta'] },
   creado_en: '2026-01-01T00:00:00Z', actualizado_en: '2026-01-01T00:00:00Z',
 };
@@ -49,7 +49,10 @@ export async function mascotaDe(rol: Rol): Promise<Mascota | null> {
     return l.find((m) => m.rol === rol) ?? (rol === 'autor' ? PAREJA_DEMO : null);
   }
   const { data } = await supabase.from('mascota').select('*').eq('rol', rol).maybeSingle();
-  return (data as Mascota | null) ?? null;
+  if (!data) return null;
+  // Ojos y boca llegaron después (migración 0016): una fila vieja los trae vacíos.
+  const m = data as Mascota;
+  return { ...m, ojos: m.ojos ?? 'redondos', boca: m.boca ?? 'sonrisa' };
 }
 
 export async function guardarMascota(m: Omit<Mascota, 'creado_en' | 'actualizado_en'>) {

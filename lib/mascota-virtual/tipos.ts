@@ -5,6 +5,9 @@ import type { Rol } from '../sesion';
 export type Especie = 'paloma' | 'gato' | 'perro' | 'oso' | 'cerdito' | 'raton' | 'vaca';
 export type Orejas = 'puntiagudas' | 'caidas' | 'redondas' | 'grandes' | 'laterales' | 'cresta';
 export type Hocico = 'chico' | 'trufa' | 'chancho' | 'pico' | 'ancho';
+export type Ojos = 'redondos' | 'grandes' | 'puntitos' | 'felices' | 'somnolientos' | 'brillantes';
+/** Con hocico 'pico' la boca no se dibuja: el pico ya es la boca. */
+export type Boca = 'sonrisa' | 'gatuna' | 'chica' | 'lengua' | 'abierta' | 'ninguna';
 
 export const ESPECIES: { id: Especie; nombre: string; orejas: Orejas; hocico: Hocico; c1: string; c2: string }[] = [
   { id: 'paloma', nombre: 'Paloma', orejas: 'cresta', hocico: 'pico', c1: '#F3F0F6', c2: '#D9D3E0' },
@@ -33,6 +36,24 @@ export const HOCICOS: { id: Hocico; nombre: string }[] = [
   { id: 'ancho', nombre: 'Ancho' },
 ];
 
+export const OJOS: { id: Ojos; nombre: string }[] = [
+  { id: 'redondos', nombre: 'Redondos' },
+  { id: 'grandes', nombre: 'Grandes' },
+  { id: 'puntitos', nombre: 'Puntitos' },
+  { id: 'felices', nombre: 'Felices' },
+  { id: 'somnolientos', nombre: 'Somnolientos' },
+  { id: 'brillantes', nombre: 'Brillantes' },
+];
+
+export const BOCAS: { id: Boca; nombre: string }[] = [
+  { id: 'sonrisa', nombre: 'Sonrisa' },
+  { id: 'gatuna', nombre: 'Gatuna' },
+  { id: 'chica', nombre: 'Chiquita' },
+  { id: 'lengua', nombre: 'Con lengua' },
+  { id: 'abierta', nombre: 'Abierta' },
+  { id: 'ninguna', nombre: 'Sin boca' },
+];
+
 // Paleta cerrada de pelaje: pastel, la misma del mockup.
 export const PALETA_PELAJE = ['#FFB6D5', '#FFF3C4', '#D8D2FF', '#C8ECD9', '#B98A6A', '#E9E9EE', '#F3F0F6', '#C9A66B', '#FFFFFF', '#BEE7FF'];
 export const PALETA_SECUNDARIA = ['#FFDDEB', '#FFFFFF', '#F3E4C8', '#FFD6E4', '#D9D3E0', '#3D3A42', '#FFB6D5', '#6B4A38'];
@@ -50,6 +71,8 @@ export type Mascota = {
   especie: Especie;
   orejas: Orejas;
   hocico: Hocico;
+  ojos: Ojos;
+  boca: Boca;
   color_pelaje: string;
   color_secundario: string;
   nombre: string;

@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, cancelAnimation } from 'react-native-reanimated';
 import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
 import { item } from '@/lib/mascota-virtual/catalogo';
-import type { Especie, Hocico, Look, Orejas } from '@/lib/mascota-virtual/tipos';
+import type { Boca, Especie, Hocico, Look, Ojos, Orejas } from '@/lib/mascota-virtual/tipos';
 import { ANCLA, dibujoPrenda } from './Prendas';
 
 const TRAZO = '#4A3B45';
@@ -16,6 +16,8 @@ export type PropsMascota = {
   especie: Especie;
   orejas: Orejas;
   hocico: Hocico;
+  ojos?: Ojos;
+  boca?: Boca;
   c1: string;
   c2: string;
   look?: Look;
@@ -25,7 +27,7 @@ export type PropsMascota = {
   durmiendo?: boolean;
 };
 
-export function MascotaVirtual({ especie, orejas, hocico, c1, c2, look = {}, animo = 0.8, size = 160, quieta, durmiendo }: PropsMascota) {
+export function MascotaVirtual({ especie, orejas, hocico, ojos = 'redondos', boca = 'sonrisa', c1, c2, look = {}, animo = 0.8, size = 160, quieta, durmiendo }: PropsMascota) {
   const [parpadeo, setParpadeo] = useState(false);
   const rebote = useSharedValue(0);
 
@@ -100,17 +102,15 @@ export function MascotaVirtual({ especie, orejas, hocico, c1, c2, look = {}, ani
         <Ellipse cx={30} cy={72} rx={8} ry={5} fill="#FFC7D6" opacity={0.75} />
         <Ellipse cx={90} cy={72} rx={8} ry={5} fill="#FFC7D6" opacity={0.75} />
         {/* ojos */}
-        {cerrados ? (
+        {cerrados || ojos === 'felices' ? (
           <G stroke={OJO} strokeWidth={2.5} strokeLinecap="round" fill="none">
-            <Path d="M36 58c3 3 8 3 11 0" />
-            <Path d="M73 58c3 3 8 3 11 0" />
+            {ojos === 'felices' && !cerrados
+              ? <><Path d="M36 59c3-4 8-4 11 0" /><Path d="M73 59c3-4 8-4 11 0" /></>
+              : <><Path d="M36 58c3 3 8 3 11 0" /><Path d="M73 58c3 3 8 3 11 0" /></>}
           </G>
         ) : (
           <G>
-            <Ellipse cx={41.5} cy={56.5} rx={3.6} ry={4.6} fill={OJO} />
-            <Ellipse cx={78.5} cy={56.5} rx={3.6} ry={4.6} fill={OJO} />
-            <Circle cx={42.8} cy={55} r={1.3} fill="#FFFFFF" />
-            <Circle cx={79.8} cy={55} r={1.3} fill="#FFFFFF" />
+            {ojosDe(ojos, c1)}
             {animo < 0.35 ? (
               <G stroke={OJO} strokeWidth={2} strokeLinecap="round">
                 <Path d="M34 49l10 3" /><Path d="M86 49l-10 3" />
@@ -120,8 +120,8 @@ export function MascotaVirtual({ especie, orejas, hocico, c1, c2, look = {}, ani
         )}
         {/* hocico / pico */}
         {hocicoDe(hocico, c2)}
-        {/* boca */}
-        <Path d={boca(animo, hocico)} fill="none" stroke={TRAZO} strokeWidth={2} strokeLinecap="round" />
+        {/* boca: con pico no va, el pico ya es la boca */}
+        {hocico !== 'pico' ? bocaDe(boca, animo, hocico) : null}
         {durmiendo ? (
           <G fill="none" stroke={OJO} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M96 34h8l-8 8h8" /><Path d="M106 22h6l-6 6h6" />
@@ -135,11 +135,78 @@ export function MascotaVirtual({ especie, orejas, hocico, c1, c2, look = {}, ani
   );
 }
 
-function boca(animo: number, hocico: Hocico): string {
-  const y = hocico === 'ancho' || hocico === 'chancho' ? 94 : hocico === 'pico' ? 92 : 90;
-  if (animo < 0.35) return `M52 ${y + 3}c3-3 13-3 16 0`;
-  if (animo < 0.6) return `M53 ${y}h14`;
-  return `M52 ${y - 1}c3 4 13 4 16 0`;
+function ojosDe(tipo: Ojos, c1: string) {
+  const L = 41.5, R = 78.5, Y = 56.5;
+  switch (tipo) {
+    case 'grandes':
+      return (
+        <G>
+          <Ellipse cx={L} cy={Y} rx={5.6} ry={6.8} fill={OJO} /><Ellipse cx={R} cy={Y} rx={5.6} ry={6.8} fill={OJO} />
+          <Circle cx={L + 2} cy={Y - 2.6} r={1.9} fill="#FFFFFF" /><Circle cx={R + 2} cy={Y - 2.6} r={1.9} fill="#FFFFFF" />
+          <Circle cx={L - 1.8} cy={Y + 2.6} r={1} fill="#FFFFFF" /><Circle cx={R - 1.8} cy={Y + 2.6} r={1} fill="#FFFFFF" />
+        </G>
+      );
+    case 'puntitos':
+      return <G><Circle cx={L} cy={Y} r={2.6} fill={OJO} /><Circle cx={R} cy={Y} r={2.6} fill={OJO} /></G>;
+    case 'somnolientos':
+      return (
+        <G>
+          <Ellipse cx={L} cy={Y} rx={4} ry={5} fill={OJO} /><Ellipse cx={R} cy={Y} rx={4} ry={5} fill={OJO} />
+          <Path d={`M${L - 5} ${Y - 6}h10v5h-10z`} fill={c1} /><Path d={`M${R - 5} ${Y - 6}h10v5h-10z`} fill={c1} />
+          <Path d={`M${L - 5} ${Y - 1}h10M${R - 5} ${Y - 1}h10`} stroke={OJO} strokeWidth={2} strokeLinecap="round" />
+          <Circle cx={L + 1.5} cy={Y + 1} r={1.1} fill="#FFFFFF" /><Circle cx={R + 1.5} cy={Y + 1} r={1.1} fill="#FFFFFF" />
+        </G>
+      );
+    case 'brillantes':
+      return (
+        <G>
+          <Ellipse cx={L} cy={Y} rx={5} ry={6.2} fill={OJO} /><Ellipse cx={R} cy={Y} rx={5} ry={6.2} fill={OJO} />
+          <Path d={`M${L + 1} ${Y - 5}l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z`} fill="#FFFFFF" />
+          <Path d={`M${R + 1} ${Y - 5}l1 2.2 2.2 1-2.2 1-1 2.2-1-2.2-2.2-1 2.2-1z`} fill="#FFFFFF" />
+          <Circle cx={L - 1.8} cy={Y + 3} r={1.1} fill="#FFFFFF" /><Circle cx={R - 1.8} cy={Y + 3} r={1.1} fill="#FFFFFF" />
+        </G>
+      );
+    default:
+      return (
+        <G>
+          <Ellipse cx={L} cy={Y} rx={3.6} ry={4.6} fill={OJO} /><Ellipse cx={R} cy={Y} rx={3.6} ry={4.6} fill={OJO} />
+          <Circle cx={L + 1.3} cy={Y - 1.5} r={1.3} fill="#FFFFFF" /><Circle cx={R + 1.3} cy={Y - 1.5} r={1.3} fill="#FFFFFF" />
+        </G>
+      );
+  }
+}
+
+function bocaDe(tipo: Boca, animo: number, hocico: Hocico) {
+  if (tipo === 'ninguna') return null;
+  const y = hocico === 'ancho' || hocico === 'chancho' ? 94 : 90;
+  const t = { fill: 'none' as const, stroke: TRAZO, strokeWidth: 2, strokeLinecap: 'round' as const };
+  // Curva según ánimo: triste hacia abajo, neutra recta, contenta hacia arriba.
+  const curva = (ancho: number, x0: number) =>
+    animo < 0.35 ? `M${x0} ${y + 3}c${ancho * 0.2}-3 ${ancho * 0.8}-3 ${ancho} 0`
+      : animo < 0.6 ? `M${x0 + 1} ${y}h${ancho - 2}`
+        : `M${x0} ${y - 1}c${ancho * 0.2} 4 ${ancho * 0.8} 4 ${ancho} 0`;
+  switch (tipo) {
+    case 'gatuna':
+      return <Path d={animo < 0.35 ? `M50 ${y + 2}c3-3 7-3 10 0c3-3 7-3 10 0` : `M50 ${y - 1}c3 3 7 3 10 0c3 3 7 3 10 0`} {...t} />;
+    case 'chica':
+      return <Path d={curva(8, 56)} {...t} />;
+    case 'lengua':
+      return (
+        <G>
+          <Path d={curva(16, 52)} {...t} />
+          <Path d={`M57 ${y + 1}c0 5 6 5 6 0z`} fill="#FF8FAA" stroke={TRAZO} strokeWidth={1.4} strokeLinejoin="round" />
+        </G>
+      );
+    case 'abierta':
+      return (
+        <G>
+          <Ellipse cx={60} cy={y + 1} rx={5} ry={animo < 0.35 ? 2.5 : 4} fill={TRAZO} />
+          <Ellipse cx={60} cy={y + 3} rx={3} ry={1.6} fill="#FF8FAA" />
+        </G>
+      );
+    default:
+      return <Path d={curva(16, 52)} {...t} />;
+  }
 }
 
 function orejasDe(tipo: Orejas, especie: Especie, c1: string, c2: string) {

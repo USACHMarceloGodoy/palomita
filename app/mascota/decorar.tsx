@@ -48,7 +48,7 @@ export default function Decorar() {
       <Cabecera titulo="Decorar la casa" subtitulo="Lo que compres en la tienda aparece aquí." />
       <View style={{ alignSelf: 'center', ...sombras.rosada }}>
         <Habitacion decoracion={deco} ancho={ancho}>
-          <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={ancho * 0.4} quieta />
+          <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look} size={ancho * 0.4} quieta />
         </Habitacion>
       </View>
 

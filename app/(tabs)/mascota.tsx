@@ -99,7 +99,7 @@ export default function PantallaMascota() {
           <Habitacion decoracion={mascota.decoracion} ancho={anchoCasa}>
             <Pressable onPress={cariño} accessibilityRole="button" accessibilityLabel={`Acariciar a ${mascota.nombre}`}>
               <MascotaVirtual
-                especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico}
+                especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca}
                 c1={mascota.color_pelaje} c2={mascota.color_secundario} look={mascota.look}
                 animo={animo.animo01} size={anchoCasa * 0.42} durmiendo={noche && valores.afecto > 30}
               />

@@ -52,7 +52,7 @@ export default function Armario() {
     <Pantalla fondo={colores.rosaBase}>
       <Cabecera titulo={`Vestir a ${mascota.nombre}`} />
       <View style={{ alignItems: 'center' }}>
-        <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={look} size={210} />
+        <MascotaVirtual especie={mascota.especie} orejas={mascota.orejas} hocico={mascota.hocico} ojos={mascota.ojos} boca={mascota.boca} c1={mascota.color_pelaje} c2={mascota.color_secundario} look={look} size={210} />
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>

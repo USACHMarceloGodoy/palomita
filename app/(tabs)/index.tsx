@@ -86,7 +86,7 @@ export default function Inicio() {
         if (!vivo) return;
         setAnimo(em.animo01);
         setFraseMascota(em.frase);
-        ultimaNota().then((n) => { if (vivo) setNota(n); }).catch(() => {});
+        ultimaNota(rol ?? 'ella').then((n) => { if (vivo) setNota(n); }).catch(() => {});
         requestWidgetUpdate({
           widgetName: 'Palomita',
           renderWidget: () => <PalomitaWidget dias={diasEntre(c.fecha_inicio)} mensaje={m?.texto?.split('\n')[0] ?? 'Hay algo para ti.'} frase={em.frase} />,
@@ -188,22 +188,22 @@ export default function Inicio() {
         <Texto variante="cuerpoBold" style={{ fontSize: 13, color: colores.gris }}>{dias} días juntos</Texto>
       </View>
 
-      {nota ? (
-        <Pressable onPress={() => router.push({ pathname: '/nota', params: { id: nota.id } })}>
-          <Tarjeta fondo={colores.crema} borde={colores.amarillo} style={estilos.nota}>
-            <View style={estilos.fila}>
-              <Texto variante="etiqueta">Te dejó una nota</Texto>
-              {!nota.visto_en ? <View style={estilos.nuevo}><Texto variante="cuerpoBold" style={{ fontSize: 12 }}>nueva</Texto></View> : null}
-            </View>
-            <Texto variante="manuscritaGrande" style={{ marginTop: 10, fontSize: 19 }} numberOfLines={2}>
-              {nota.texto ?? 'Te dibujó algo.'}
-            </Texto>
-            <Texto variante="apoyo" style={{ marginTop: 8, fontSize: 12 }}>
-              {nota.visto_en ? 'Tócala para volver a verla' : 'Tócala para abrirla'}
-            </Texto>
-          </Tarjeta>
-        </Pressable>
-      ) : null}
+      <Pressable onPress={() => router.push('/nota')}>
+        <Tarjeta fondo={colores.crema} borde={colores.amarillo} style={estilos.nota}>
+          <View style={estilos.fila}>
+            <Texto variante="etiqueta">{nota ? 'Te dejó una nota' : 'Notas'}</Texto>
+            {nota && !nota.visto_en ? (
+              <View style={estilos.nuevo}><Texto variante="cuerpoBold" style={{ fontSize: 12 }}>nueva</Texto></View>
+            ) : null}
+          </View>
+          <Texto variante="manuscritaGrande" style={{ marginTop: 10, fontSize: 19 }} numberOfLines={2}>
+            {nota ? (nota.texto ?? 'Te dibujó algo.') : 'Déjale una nota o un dibujo.'}
+          </Texto>
+          <Texto variante="apoyo" style={{ marginTop: 8, fontSize: 12 }}>
+            {nota ? (nota.visto_en ? 'Tócala para volver a verla' : 'Tócala para abrirla') : 'Tócame para escribirle'}
+          </Texto>
+        </Tarjeta>
+      </Pressable>
 
       <Tarjeta>
         <View style={estilos.fila}>

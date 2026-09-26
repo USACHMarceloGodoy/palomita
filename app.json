@@ -79,7 +79,9 @@
             }
           ]
         }
-      ]
+      ],
+      "expo-image-picker",
+      "expo-document-picker"
     ],
     "updates": {
       "url": "https://u.expo.dev/4409e77c-d67e-447f-b445-16f9304babdd",

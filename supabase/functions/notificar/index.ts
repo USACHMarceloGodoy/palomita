@@ -105,9 +105,11 @@ Deno.serve(async (req) => {
     return Response.json({ ok: true });
   }
 
-  // Le dejaste una nota (texto o dibujo) → a ella
+  // Nota nueva → al otro. Las notas van en los dos sentidos: `autor_rol` dice
+  // quién la escribió, así que el aviso va para el que falta.
   if (p.table === "notas" && p.type === "INSERT" && p.record) {
-    const to = await tokenDe("ella");
+    const de = (String(p.record.autor_rol ?? "autor")) as "ella" | "autor";
+    const to = await tokenDe(de === "ella" ? "autor" : "ella");
     const texto = (p.record.texto as string | null)?.trim();
     const hayDibujo = !!p.record.dibujo_path;
     await enviar([{

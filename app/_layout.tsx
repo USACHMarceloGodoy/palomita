@@ -69,6 +69,7 @@ export default function Layout() {
           <Stack.Screen name="autor" options={{ animation: 'slide_from_right' }} />
           <Stack.Screen name="dibujar" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="nota" options={{ animation: 'fade' }} />
+          <Stack.Screen name="escribir-nota" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="dormir" options={{ animation: 'fade', contentStyle: { backgroundColor: '#1B1519' } }} />
         </Stack>
       </SafeAreaProvider>

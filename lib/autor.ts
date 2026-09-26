@@ -4,12 +4,14 @@
 // y ver cómo estuvo ella. Las RLS ya filtran: estas funciones solo corren
 // bien si la sesión es la del autor.
 import { supabase } from './supabase';
+import type { Rol } from './sesion';
 import type { CategoriaBotiquin, Checkin, Mensaje, TipoMensaje } from './tipos';
 
 export type Nota = {
   id: string;
   texto: string | null;
   dibujo_path: string | null;
+  autor_rol: Rol;
   creado_en: string;
   visto_en: string | null;
 };
@@ -28,29 +30,41 @@ export async function notas(limite = 30): Promise<Nota[]> {
 }
 
 /**
- * La nota más reciente, la haya visto o no. Se queda fija en Inicio, arriba
- * del mensaje del día: no desaparece al abrirla, solo la pisa la siguiente.
+ * La última nota que te dejó el otro, la hayas visto o no. Se queda fija en
+ * Inicio, arriba del mensaje del día: no desaparece al abrirla, solo la pisa
+ * la siguiente que llegue.
  */
-export async function ultimaNota(): Promise<Nota | null> {
+export async function ultimaNota(miRol: Rol): Promise<Nota | null> {
   const { data } = await supabase
     .from('notas')
     .select('*')
+    .neq('autor_rol', miRol)
     .order('creado_en', { ascending: false })
     .limit(1)
     .maybeSingle();
   return (data as Nota) ?? null;
 }
 
+/** Todas las notas del hilo, de los dos, para el buzón. */
+export async function hiloDeNotas(limite = 40): Promise<Nota[]> {
+  const { data } = await supabase
+    .from('notas')
+    .select('*')
+    .order('creado_en', { ascending: false })
+    .limit(limite);
+  return (data ?? []) as Nota[];
+}
+
 export async function marcarNotaVista(id: string) {
   await supabase.from('notas').update({ visto_en: new Date().toISOString() }).eq('id', id).is('visto_en', null);
 }
 
-export async function crearNota(texto: string, dibujoSvg?: string | null): Promise<void> {
+export async function crearNota(rol: Rol, texto: string, dibujoSvg?: string | null): Promise<void> {
   const limpio = texto.trim();
   let dibujo_path: string | null = null;
   if (dibujoSvg) dibujo_path = await subirDibujo(dibujoSvg);
   if (!limpio && !dibujo_path) throw new Error('La nota está vacía');
-  const { error } = await supabase.from('notas').insert({ texto: limpio || null, dibujo_path });
+  const { error } = await supabase.from('notas').insert({ texto: limpio || null, dibujo_path, autor_rol: rol });
   if (error) throw error;
 }
 
@@ -156,4 +170,116 @@ export async function ultimasAlertas(limite = 5): Promise<Alerta[]> {
 export async function saldoDeElla(): Promise<number> {
   const { data } = await supabase.from('saldo_besitos').select('saldo').maybeSingle();
   return (data as { saldo: number } | null)?.saldo ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// El panel completo, desde el teléfono
+// ---------------------------------------------------------------------------
+
+/** Sube un archivo del teléfono al bucket privado `media`. */
+export async function subirArchivo(uri: string, nombre: string, contentType: string, carpeta: string): Promise<string> {
+  const limpio = nombre.replace(/[^\w.\-]/g, '_');
+  const destino = `${carpeta}/${Date.now()}-${limpio}`;
+  // fetch sobre un file:// local devuelve el binario; así no hace falta
+  // pasar por base64 ni por el sistema de archivos.
+  const bytes = await (await fetch(uri)).arrayBuffer();
+  const { error } = await supabase.storage.from('media').upload(destino, bytes, { contentType, upsert: false });
+  if (error) throw error;
+  return destino;
+}
+
+export async function crearVariante(texto: string, categoria: string) {
+  const { error } = await supabase.from('multiverso').insert({ texto: texto.trim(), categoria: categoria || 'general' });
+  if (error) throw error;
+}
+
+export async function crearPregunta(pregunta: string, opciones: string[], correcta: number) {
+  const { error } = await supabase.from('trivia').insert({ pregunta: pregunta.trim(), opciones, correcta });
+  if (error) throw error;
+}
+
+export async function crearPalabra(palabra: string, definicion: string, ejemplo: string | null) {
+  const { error } = await supabase.from('diccionario').insert({
+    palabra: palabra.trim(), definicion: definicion.trim(), ejemplo: ejemplo?.trim() || null,
+  });
+  if (error) throw error;
+}
+
+export async function crearCapitulo(numero: number, titulo: string, texto: string, publicaEn: string) {
+  const { error } = await supabase.from('capitulos').insert({
+    numero, titulo: titulo.trim(), texto: texto.trim(), publica_en: `${publicaEn}T09:00:00-03:00`,
+  });
+  if (error) throw error;
+}
+
+export async function crearCapsula(titulo: string, contenido: string, abreEn: string, mediaPath: string | null) {
+  const { error } = await supabase.from('capsulas').insert({
+    titulo: titulo.trim(), contenido: contenido.trim() || null, media_path: mediaPath, abre_en: `${abreEn}T09:00:00-03:00`,
+  });
+  if (error) throw error;
+}
+
+export async function crearCupon(titulo: string, descripcion: string, costo: number) {
+  const { error } = await supabase.from('cupones').insert({
+    titulo: titulo.trim(), descripcion: descripcion.trim() || null, costo,
+  });
+  if (error) throw error;
+}
+
+export async function crearPremioRuleta(titulo: string, descripcion: string, peso: number) {
+  const { error } = await supabase.from('ruleta').insert({
+    titulo: titulo.trim(), descripcion: descripcion.trim() || null, peso, activo: true,
+  });
+  if (error) throw error;
+}
+
+export async function crearEvento(fecha: string, tipoParticula: string, mensaje: string, mensajeDia: string, recurrente: boolean) {
+  const { error } = await supabase.from('eventos').insert({
+    fecha, tipo_particula: tipoParticula, mensaje: mensaje.trim() || null,
+    mensaje_dia: mensajeDia.trim() || null, recurrente,
+  });
+  if (error) throw error;
+}
+
+export async function crearRecuerdo(fotoPath: string, texto: string, fecha: string, lugar: string, inedito: boolean) {
+  const { error } = await supabase.from('recuerdos').insert({
+    foto_path: fotoPath, texto: texto.trim(), fecha: fecha || null, lugar: lugar.trim() || null, inedito,
+  });
+  if (error) throw error;
+}
+
+export async function crearAnimoAudio(categoria: CategoriaBotiquin, mediaPath: string, inedito: boolean) {
+  const { error } = await supabase.from('botiquin').insert({
+    categoria, tipo: 'audio', media_path: mediaPath, inedito,
+  });
+  if (error) throw error;
+}
+
+export async function crearCuento(titulo: string, audioPath: string, serie: string | null, numero: number | null) {
+  const { error } = await supabase.from('cuentos').insert({
+    titulo: titulo.trim(), audio_path: audioPath, serie: serie?.trim() || null,
+    numero: serie?.trim() ? numero ?? 1 : null,
+  });
+  if (error) throw error;
+}
+
+export async function crearLugar(titulo: string, lat: number, lng: number, radio: number) {
+  const { error } = await supabase.from('lugares').insert({ titulo: titulo.trim(), lat, lng, radio_m: radio });
+  if (error) throw error;
+}
+
+export async function crearRespuestaCheckin(emoji: string, texto: string) {
+  const { error } = await supabase.from('respuestas_checkin').insert({ emoji, texto: texto.trim() });
+  if (error) throw error;
+}
+
+/** Cuántas filas hay en cada tabla, para ver de un vistazo qué falta llenar. */
+export async function inventario(): Promise<Record<string, number>> {
+  const tablas = ['mensajes', 'recuerdos', 'botiquin', 'multiverso', 'capsulas', 'lugares', 'trivia', 'cupones', 'ruleta', 'diccionario', 'capitulos', 'cuentos', 'eventos', 'notas'];
+  const out: Record<string, number> = {};
+  await Promise.all(tablas.map(async (t) => {
+    const { count } = await supabase.from(t).select('id', { count: 'exact', head: true });
+    out[t] = count ?? 0;
+  }));
+  return out;
 }

@@ -3,6 +3,8 @@
 import { supabase, supabaseConfigurado } from './supabase';
 import { leerCache, guardarCache } from './cache';
 import type { EstadoMascota } from './tipos';
+import { mascotaDe } from './mascota-virtual/datos';
+import { sumar } from './mascota-virtual/necesidades';
 
 const demo = !supabaseConfigurado;
 const BASE: EstadoMascota = { animo: 60, ultima_comida: null, ultimo_contenido: null };
@@ -36,6 +38,10 @@ export async function subirAnimo(cuanto: number, motivo: 'mensaje' | 'checkin' |
     ultimo_contenido: motivo === 'contenido' ? new Date().toISOString() : e.ultimo_contenido,
   };
   await escribir(nuevo);
+  // Lo que alegra a Palomita también le da afecto a la mascota de ella, si ya la creó.
+  if (await mascotaDe('ella').catch(() => null)) {
+    await sumar('ella', { afecto: Math.max(1, Math.round(cuanto / 2)) }).catch(() => {});
+  }
 }
 
 export const alimentar = () => subirAnimo(15, 'comida');

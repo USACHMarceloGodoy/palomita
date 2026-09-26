@@ -71,6 +71,7 @@ export default function Layout() {
           <Stack.Screen name="nota" options={{ animation: 'fade' }} />
           <Stack.Screen name="escribir-nota" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="dormir" options={{ animation: 'fade', contentStyle: { backgroundColor: '#1B1519' } }} />
+          <Stack.Screen name="mascota" options={{ animation: 'slide_from_right' }} />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

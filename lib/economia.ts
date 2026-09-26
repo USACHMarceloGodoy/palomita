@@ -14,7 +14,19 @@ export type Origen =
   | 'tienda:audio'
   | 'tienda:cupon'
   | 'tienda:sticker'
-  | 'tienda:comida';
+  | 'tienda:comida'
+  // sistema de mascota virtual
+  | 'tienda:mascota'
+  | 'mascota:alimentar'
+  | 'mascota:banar'
+  | 'mascota:acariciar'
+  | 'mascota:vender'
+  | 'pesca'
+  | 'estadio'
+  | 'arbol'
+  | 'cocina'
+  | 'museo'
+  | 'visita';
 
 export const RECOMPENSAS = {
   checkin: 10,

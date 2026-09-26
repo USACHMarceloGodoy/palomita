@@ -1,6 +1,7 @@
 // Palomita · Edge Function `notificar`
-// Recibe webhooks de Postgres (insert en checkins / alertas) y llamadas de
-// pg_cron (mensaje del día, cápsulas), y manda push por Expo.
+// Recibe webhooks de Postgres (insert en checkins / alertas / notas / chat /
+// regalos de mascota) y llamadas de pg_cron (mensaje del día, cápsulas,
+// necesidades de la mascota), y manda push por Expo.
 //
 // Deploy:  supabase functions deploy notificar --no-verify-jwt
 // Secrets: supabase secrets set WEBHOOK_SECRET=... (el mismo que va en las migraciones)
@@ -119,6 +120,51 @@ Deno.serve(async (req) => {
       data: { tipo: "nota", id: p.record.id },
     }]);
     return Response.json({ ok: true });
+  }
+
+  // Regalo entre mascotas → al que lo recibe
+  if (p.table === "regalos_mascota" && p.type === "INSERT" && p.record) {
+    const para = String(p.record.para_rol) as "ella" | "autor";
+    const to = await tokenDe(para);
+    await enviar([{
+      to: to ?? "",
+      title: "Tu mascota recibió un regalo",
+      body: (p.record.mensaje as string | null)?.trim() || "Tu pareja le dejó algo. Ábrelo en su casa.",
+      data: { tipo: "regalo_mascota" },
+    }]);
+    return Response.json({ ok: true });
+  }
+
+  // Cron cada 2 h → "tu mascota te necesita" si alguna barra está bajo 20 %.
+  // El valor real se recalcula igual que en la app: puntos por hora desde la
+  // última marca de tiempo. Máximo un aviso cada 8 h por persona.
+  if (p.table === "mascota" && p.type === "CRON") {
+    const TASA = { hambre: 4, higiene: 2, afecto: 3 } as const;
+    const { data: filas } = await db.from("mascota_necesidades").select("*");
+    const { data: mascotas } = await db.from("mascota").select("rol, nombre");
+    const ahora = Date.now();
+    const avisos: Push[] = [];
+    const avisados: string[] = [];
+    for (const n of filas ?? []) {
+      if (n.avisado_en && ahora - new Date(n.avisado_en).getTime() < 8 * 3_600_000) continue;
+      const bajas: string[] = [];
+      for (const k of ["hambre", "higiene", "afecto"] as const) {
+        const horas = Math.max(0, (ahora - new Date(n[`${k}_en`]).getTime()) / 3_600_000);
+        const v = Math.max(0, Math.min(100, Math.round(n[k] - horas * TASA[k])));
+        if (v < 20) bajas.push(k === "hambre" ? "tiene hambre" : k === "higiene" ? "quiere un baño" : "te extraña");
+      }
+      if (!bajas.length) continue;
+      const to = await tokenDe(n.rol as "ella" | "autor");
+      if (!to) continue;
+      const nombre = mascotas?.find((m) => m.rol === n.rol)?.nombre ?? "Tu mascota";
+      avisos.push({ to, title: `${nombre} te necesita`, body: `${nombre} ${bajas.join(" y ")}.`, data: { tipo: "mascota" } });
+      avisados.push(n.rol as string);
+    }
+    if (avisos.length) {
+      await enviar(avisos);
+      await db.from("mascota_necesidades").update({ avisado_en: new Date().toISOString() }).in("rol", avisados);
+    }
+    return Response.json({ ok: true, n: avisos.length });
   }
 
   // Cron 09:00 → a ella si hay mensaje con fecha de hoy y aún no visto

@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
   cancelAnimation,
 } from 'react-native-reanimated';
-import { Figura, FORMAS_GRANDES, type Forma } from './Figuras';
+import { COLORES_PERSONAJE, Figura, FORMAS_GRANDES, type Forma } from './Figuras';
 
 export type TipoParticula =
   | 'sorpresa' | 'kawaii' | 'bichitos' | 'comida' | 'flores-rosas' | 'flores-amarillas'
@@ -77,8 +77,8 @@ export function Particulas({ tipo = 'sorpresa', densidad = 26, duracion, style }
       if (grande) size = Math.round(size * 1.3);
       out.push({
         forma,
-        c1: c.mix ? par[0] : c.c1 ?? '#FF6F91',
-        c2: c.mix ? par[1] : c.c2 ?? '#FFD93D',
+        c1: COLORES_PERSONAJE[forma]?.[0] ?? (c.mix ? par[0] : c.c1 ?? '#FF6F91'),
+        c2: COLORES_PERSONAJE[forma]?.[1] ?? (c.mix ? par[1] : c.c2 ?? '#FFD93D'),
         left: (((i * 37) % 97) - 4) / 100,
         size,
         dur: (forma === 'gota' ? 2.2 + ((i * 29) % 30) / 10 : 7 + ((i * 29) % 65) / 10) * 1000,

@@ -1,4 +1,5 @@
 // Las 14 figuras del motor de partículas, portadas del artboard "Splash · motor".
+// Todas reciben c1/c2: las de personaje también, con COLORES_PERSONAJE como valor habitual.
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 import { Image } from 'expo-image';
 import { sprite } from '@/lib/sprites';
@@ -7,6 +8,12 @@ export type Forma =
   | 'flor' | 'rosa' | 'girasol' | 'corazon' | 'volantin' | 'lazo' | 'gatito'
   | 'capibara' | 'zuricata' | 'oveja' | 'conejito' | 'frutilla' | 'hamburguesa' | 'lana'
   | 'vaca' | 'cerdo' | 'gota' | 'paraguas';
+
+/** Colores por defecto de las formas de personaje (c1 = cuerpo, c2 = detalle). */
+export const COLORES_PERSONAJE: Partial<Record<Forma, [string, string]>> = {
+  gatito: ['#FFF8F0', '#FFB3C6'], capibara: ['#B98B5E', '#8C6239'], zuricata: ['#C9A97E', '#A8875E'],
+  oveja: ['#FFF8F0', '#4A3B45'], conejito: ['#FFF8F0', '#FFB3C6'], vaca: ['#FFF8F0', '#4A3B45'], cerdo: ['#FFB3C6', '#FF8FAA'],
+};
 
 export const FORMAS_GRANDES: Partial<Record<Forma, true>> = {
   capibara: true, zuricata: true, oveja: true, conejito: true, gatito: true, hamburguesa: true,
@@ -80,23 +87,23 @@ function cuerpo(forma: Forma, c1: string, c2: string) {
     case 'gatito':
       return (
         <G>
-          <Path d="M11.5 13.5L9.5 5.5l7.5 3.8M28.5 13.5l2-8-7.5 3.8" fill="#FFF8F0" stroke="#4A3B45" strokeWidth={1.4} strokeLinejoin="round" />
-          <Circle cx={20} cy={22.5} r={12.8} fill="#FFF8F0" stroke="#4A3B45" strokeWidth={1.4} />
+          <Path d="M11.5 13.5L9.5 5.5l7.5 3.8M28.5 13.5l2-8-7.5 3.8" fill={c1} stroke="#4A3B45" strokeWidth={1.4} strokeLinejoin="round" />
+          <Circle cx={20} cy={22.5} r={12.8} fill={c1} stroke="#4A3B45" strokeWidth={1.4} />
           <Circle cx={15.4} cy={21} r={1.8} fill="#4A3B45" />
           <Circle cx={24.6} cy={21} r={1.8} fill="#4A3B45" />
           <Ellipse cx={20} cy={25} rx={1.9} ry={1.4} fill="#FF6F91" />
           <Path d="M17.6 28c1.4 1.3 3.4 1.3 4.8 0" fill="none" stroke="#4A3B45" strokeWidth={1.3} strokeLinecap="round" />
           <Path d="M3.5 21.5h5M31.5 21.5h5M4.5 26h4.5M30.5 26h4.5" stroke="#4A3B45" strokeWidth={1.1} strokeLinecap="round" />
-          <Ellipse cx={11.5} cy={26.5} rx={2.4} ry={1.7} fill="#FFB3C6" />
-          <Ellipse cx={28.5} cy={26.5} rx={2.4} ry={1.7} fill="#FFB3C6" />
+          <Ellipse cx={11.5} cy={26.5} rx={2.4} ry={1.7} fill={c2} />
+          <Ellipse cx={28.5} cy={26.5} rx={2.4} ry={1.7} fill={c2} />
         </G>
       );
     case 'capibara':
       return (
         <G>
-          <Ellipse cx={11.5} cy={11.5} rx={3} ry={2.6} fill="#8C6239" />
-          <Ellipse cx={28.5} cy={11.5} rx={3} ry={2.6} fill="#8C6239" />
-          <Rect x={6.5} y={12} width={27} height={21} rx={9.5} fill="#B98B5E" stroke="#6B4A2A" strokeWidth={1.4} />
+          <Ellipse cx={11.5} cy={11.5} rx={3} ry={2.6} fill={c2} />
+          <Ellipse cx={28.5} cy={11.5} rx={3} ry={2.6} fill={c2} />
+          <Rect x={6.5} y={12} width={27} height={21} rx={9.5} fill={c1} stroke="#6B4A2A" strokeWidth={1.4} />
           <Circle cx={14} cy={20} r={1.7} fill="#4A3B45" />
           <Circle cx={26} cy={20} r={1.7} fill="#4A3B45" />
           <Ellipse cx={20} cy={27} rx={7.5} ry={4.8} fill="#CBA075" />
@@ -107,10 +114,10 @@ function cuerpo(forma: Forma, c1: string, c2: string) {
     case 'zuricata':
       return (
         <G>
-          <Path d="M28 32c4.5 1 6.5-2.5 5-6" fill="none" stroke="#C9A97E" strokeWidth={2.6} strokeLinecap="round" />
-          <Path d="M20 38c-4.5 0-7-2.4-7-7v-8.5h14V31c0 4.6-2.5 7-7 7z" fill="#C9A97E" stroke="#6B4A2A" strokeWidth={1.3} />
-          <Circle cx={12.5} cy={10.5} r={2.7} fill="#A8875E" stroke="#6B4A2A" strokeWidth={1.1} />
-          <Circle cx={27.5} cy={10.5} r={2.7} fill="#A8875E" stroke="#6B4A2A" strokeWidth={1.1} />
+          <Path d="M28 32c4.5 1 6.5-2.5 5-6" fill="none" stroke={c1} strokeWidth={2.6} strokeLinecap="round" />
+          <Path d="M20 38c-4.5 0-7-2.4-7-7v-8.5h14V31c0 4.6-2.5 7-7 7z" fill={c1} stroke="#6B4A2A" strokeWidth={1.3} />
+          <Circle cx={12.5} cy={10.5} r={2.7} fill={c2} stroke="#6B4A2A" strokeWidth={1.1} />
+          <Circle cx={27.5} cy={10.5} r={2.7} fill={c2} stroke="#6B4A2A" strokeWidth={1.1} />
           <Ellipse cx={20} cy={15.5} rx={8.4} ry={9.2} fill="#D9BC94" stroke="#6B4A2A" strokeWidth={1.3} />
           <Ellipse cx={16.3} cy={14.5} rx={2.6} ry={2.2} fill="#4A3B45" />
           <Ellipse cx={23.7} cy={14.5} rx={2.6} ry={2.2} fill="#4A3B45" />
@@ -121,32 +128,32 @@ function cuerpo(forma: Forma, c1: string, c2: string) {
     case 'oveja':
       return (
         <G>
-          <Path d="M13 30v5M22 31v4.5" stroke="#4A3B45" strokeWidth={2.2} strokeLinecap="round" />
-          <G fill="#FFF8F0" stroke="#D6C2CB" strokeWidth={1.2}>
+          <Path d="M13 30v5M22 31v4.5" stroke={c2} strokeWidth={2.2} strokeLinecap="round" />
+          <G fill={c1} stroke="#D6C2CB" strokeWidth={1.2}>
             <Circle cx={13} cy={21} r={7.2} />
             <Circle cx={21.5} cy={17.5} r={7.6} />
             <Circle cx={26} cy={24.5} r={6.6} />
             <Circle cx={17} cy={27} r={7} />
           </G>
-          <Ellipse cx={25.5} cy={12.5} rx={2.8} ry={1.7} fill="#4A3B45" transform="rotate(-24 25.5 12.5)" />
-          <Ellipse cx={30.5} cy={13.5} rx={5.6} ry={6.2} fill="#4A3B45" />
-          <Circle cx={28.8} cy={12.6} r={1.2} fill="#FFF8F0" />
-          <Circle cx={32.6} cy={13.2} r={1.2} fill="#FFF8F0" />
+          <Ellipse cx={25.5} cy={12.5} rx={2.8} ry={1.7} fill={c2} transform="rotate(-24 25.5 12.5)" />
+          <Ellipse cx={30.5} cy={13.5} rx={5.6} ry={6.2} fill={c2} />
+          <Circle cx={28.8} cy={12.6} r={1.2} fill={c1} />
+          <Circle cx={32.6} cy={13.2} r={1.2} fill={c1} />
         </G>
       );
     case 'conejito':
       return (
         <G>
-          <Ellipse cx={14.8} cy={10.5} rx={3.2} ry={8.4} fill="#FFF8F0" stroke="#E0C2CE" strokeWidth={1.3} />
-          <Ellipse cx={25.2} cy={10.5} rx={3.2} ry={8.4} fill="#FFF8F0" stroke="#E0C2CE" strokeWidth={1.3} />
-          <Ellipse cx={14.8} cy={11} rx={1.4} ry={5.4} fill="#FFB3C6" />
-          <Ellipse cx={25.2} cy={11} rx={1.4} ry={5.4} fill="#FFB3C6" />
-          <Circle cx={20} cy={26} r={10.4} fill="#FFF8F0" stroke="#E0C2CE" strokeWidth={1.3} />
+          <Ellipse cx={14.8} cy={10.5} rx={3.2} ry={8.4} fill={c1} stroke="#E0C2CE" strokeWidth={1.3} />
+          <Ellipse cx={25.2} cy={10.5} rx={3.2} ry={8.4} fill={c1} stroke="#E0C2CE" strokeWidth={1.3} />
+          <Ellipse cx={14.8} cy={11} rx={1.4} ry={5.4} fill={c2} />
+          <Ellipse cx={25.2} cy={11} rx={1.4} ry={5.4} fill={c2} />
+          <Circle cx={20} cy={26} r={10.4} fill={c1} stroke="#E0C2CE" strokeWidth={1.3} />
           <Circle cx={16.4} cy={24.6} r={1.7} fill="#4A3B45" />
           <Circle cx={23.6} cy={24.6} r={1.7} fill="#4A3B45" />
           <Path d="M20 28l-1.7 1.6h3.4z" fill="#FF6F91" />
-          <Ellipse cx={12.6} cy={28.6} rx={2.2} ry={1.6} fill="#FFB3C6" />
-          <Ellipse cx={27.4} cy={28.6} rx={2.2} ry={1.6} fill="#FFB3C6" />
+          <Ellipse cx={12.6} cy={28.6} rx={2.2} ry={1.6} fill={c2} />
+          <Ellipse cx={27.4} cy={28.6} rx={2.2} ry={1.6} fill={c2} />
         </G>
       );
     case 'frutilla':
@@ -183,7 +190,7 @@ function cuerpo(forma: Forma, c1: string, c2: string) {
     case 'vaca':
       return (
         <G>
-          <Rect x={6} y={13} width={28} height={20} rx={8} fill="#FFF8F0" stroke="#4A3B45" strokeWidth={1.3} />
+          <Rect x={6} y={13} width={28} height={20} rx={8} fill={c1} stroke="#4A3B45" strokeWidth={1.3} />
           <Path d="M10 16c3-2 6 1 5 4-2 2-6 1-5-4zM24 25c2-3 7-2 6 2-1 3-7 2-6-2z" fill="#4A3B45" />
           <Ellipse cx={11} cy={10} rx={3} ry={2} fill="#FFB3C6" stroke="#4A3B45" strokeWidth={1} />
           <Ellipse cx={29} cy={10} rx={3} ry={2} fill="#FFB3C6" stroke="#4A3B45" strokeWidth={1} />
@@ -198,11 +205,11 @@ function cuerpo(forma: Forma, c1: string, c2: string) {
     case 'cerdo':
       return (
         <G>
-          <Path d="M9 12l3-5 4 4M31 12l-3-5-4 4" fill="#FFB3C6" stroke="#D6336C" strokeWidth={1.2} strokeLinejoin="round" />
-          <Circle cx={20} cy={22} r={13} fill="#FFB3C6" stroke="#D6336C" strokeWidth={1.3} />
+          <Path d="M9 12l3-5 4 4M31 12l-3-5-4 4" fill={c1} stroke="#D6336C" strokeWidth={1.2} strokeLinejoin="round" />
+          <Circle cx={20} cy={22} r={13} fill={c1} stroke="#D6336C" strokeWidth={1.3} />
           <Circle cx={15} cy={19} r={1.6} fill="#4A3B45" />
           <Circle cx={25} cy={19} r={1.6} fill="#4A3B45" />
-          <Ellipse cx={20} cy={26} rx={5} ry={3.5} fill="#FF8FAA" stroke="#D6336C" strokeWidth={1.1} />
+          <Ellipse cx={20} cy={26} rx={5} ry={3.5} fill={c2} stroke="#D6336C" strokeWidth={1.1} />
           <Circle cx={18} cy={26} r={1} fill="#4A3B45" />
           <Circle cx={22} cy={26} r={1} fill="#4A3B45" />
           <Path d="M32 24c3 0 3 3 1 4" fill="none" stroke="#D6336C" strokeWidth={1.4} strokeLinecap="round" />

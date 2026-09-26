@@ -11,7 +11,7 @@ import {
 } from './datos';
 import { sumar } from './necesidades';
 import { temporada } from './tiempo';
-import type { Item, Necesidad, Regalo } from './tipos';
+import type { Item, ItemInventario, Medalla, Necesidad, Regalo } from './tipos';
 
 export const RECOMPENSAS_MASCOTA = {
   alimentar: 2, alimentarVecesDia: 3,
@@ -108,12 +108,36 @@ export async function vender(rol: Rol, itemId: string): Promise<number> {
 }
 
 // --------------------------------------------------------------------------
-// Pesca: elige qué pica según rareza; el cebo mejora la suerte.
+// Pesca (minijuego de barra verde). Nivel = experiencia acumulada; las cañas y
+// aparejos cambian la física del minijuego.
 // --------------------------------------------------------------------------
 export async function tiradasHoy(rol: Rol) { return vecesHoy(rol, 'pesca'); }
 
-export async function pescar(rol: Rol, conCebo: boolean): Promise<{ item: Item; besitos: number; conRecompensa: boolean }> {
-  if (conCebo) await quitarItem(rol, 'cebo');
+const FECHA_XP = '2000-01-01';
+export function nivelDeXp(xp: number) { return Math.min(10, Math.floor(Math.sqrt(xp / 30))); }
+
+export async function nivelPesca(rol: Rol): Promise<{ xp: number; nivel: number }> {
+  const p = await puntajeDe(rol, 'pesca_xp', FECHA_XP);
+  const xp = p?.puntaje ?? 0;
+  return { xp, nivel: nivelDeXp(xp) };
+}
+
+export function equipoPesca(inv: ItemInventario[]): { cana: Item; aparejos: Item[]; barra: number; drenaje: number; rebote: boolean } {
+  const tengo = (id: string) => inv.some((i) => i.item_id === id && i.cantidad > 0);
+  const canas = itemsDe('cana').filter((c) => c.id === 'cana_bambu' || tengo(c.id));
+  const cana = canas[canas.length - 1];
+  const aparejos = itemsDe('aparejo').filter((a) => tengo(a.id));
+  let barra = cana.bonus?.barra ?? 1, drenaje = cana.bonus?.drenaje ?? 1, rebote = true;
+  for (const a of aparejos) {
+    barra *= a.bonus?.barra ?? 1;
+    drenaje *= a.bonus?.drenaje ?? 1;
+    if (a.bonus?.rebote) rebote = false;
+  }
+  return { cana, aparejos, barra, drenaje, rebote };
+}
+
+/** Qué pica: rareza ponderada; el cebo dobla la suerte con los raros. */
+export function elegirPez(conCebo: boolean): Item {
   const posibles = itemsDe('pez').concat(itemsDe('fosil'));
   const peso = (i: Item) => {
     const r = i.rareza ?? 1;
@@ -124,14 +148,39 @@ export async function pescar(rol: Rol, conCebo: boolean): Promise<{ item: Item; 
   };
   const total = posibles.reduce((a, i) => a + peso(i), 0);
   let x = Math.random() * total;
-  let elegido = posibles[0];
-  for (const i of posibles) { x -= peso(i); if (x <= 0) { elegido = i; break; } }
-  await agregarItem(rol, elegido.id);
+  for (const i of posibles) { x -= peso(i); if (x <= 0) return i; }
+  return posibles[0];
+}
+
+export type ResultadoCaptura = { besitos: number; xp: number; conRecompensa: boolean; regaloCofre?: Item; nivel: number; subioNivel: boolean };
+
+/** Se llama al ganar el minijuego. Con cofre y captura, se conservan los dos. */
+export async function registrarCaptura(rol: Rol, pez: Item, o: { perfecto: boolean; tesoro: boolean; conCebo: boolean }): Promise<ResultadoCaptura> {
+  if (o.conCebo) await quitarItem(rol, 'cebo');
+  await agregarItem(rol, pez.id);
   const n = await contar(rol, 'pesca');
   const conRecompensa = n <= RECOMPENSAS_MASCOTA.pescaTiradasDia;
-  const besitos = conRecompensa ? (elegido.id === 'bota' ? 1 : RECOMPENSAS_MASCOTA.pesca[elegido.rareza ?? 1]) : 0;
+  let besitos = conRecompensa ? (pez.id === 'bota' ? 1 : RECOMPENSAS_MASCOTA.pesca[pez.rareza ?? 1]) : 0;
+  if (o.perfecto && besitos) besitos += 3;
+  const antes = await nivelPesca(rol);
+  const xp = Math.round(10 * (pez.dificultad ?? 1) * (o.perfecto ? 2.4 : 1));
+  await guardarPuntaje({ rol, juego: 'pesca_xp', fecha: FECHA_XP, puntaje: antes.xp + xp, detalle: {} });
+  let regaloCofre: Item | undefined;
+  if (o.tesoro) {
+    const bolsa = itemsDe('ingrediente').concat(itemsDe('insecto'), itemsDe('cebo'), itemsDe('cebo'));
+    regaloCofre = bolsa[Math.floor(Math.random() * bolsa.length)];
+    await agregarItem(rol, regaloCofre.id);
+    besitos += 6;
+  }
   if (besitos) await ganar('pesca', besitos).catch(() => {});
-  return { item: elegido, besitos, conRecompensa };
+  const nivel = nivelDeXp(antes.xp + xp);
+  return { besitos, xp, conRecompensa, regaloCofre, nivel, subioNivel: nivel > antes.nivel };
+}
+
+/** Se escapó: igual gasta el cebo y cuenta como tirada. */
+export async function registrarEscape(rol: Rol, conCebo: boolean) {
+  if (conCebo) await quitarItem(rol, 'cebo');
+  await contar(rol, 'pesca');
 }
 
 // --------------------------------------------------------------------------
@@ -180,13 +229,16 @@ export async function puedeCocinar(rol: Rol, recetaId: string): Promise<boolean>
   return true;
 }
 
-export async function cocinar(rol: Rol, recetaId: string): Promise<{ ok: boolean; besitos: number; plato?: Item }> {
+/** Termina una receta jugada por pasos. La medalla da besitos extra y queda de recuerdo. */
+export async function cocinar(rol: Rol, recetaId: string, medalla: Medalla = 'bronce'): Promise<{ ok: boolean; besitos: number; plato?: Item }> {
   const r = RECETAS.find((x) => x.id === recetaId);
   if (!r || !(await puedeCocinar(rol, recetaId))) return { ok: false, besitos: 0 };
   for (const ing of r.ingredientes) await quitarItem(rol, ing);
   await agregarItem(rol, r.resultado);
+  await agregarItem(rol, `medalla_${medalla}`);
   const n = await contar(rol, 'cocinar');
-  const besitos = n === 1 ? RECOMPENSAS_MASCOTA.cocinar : 0;
+  let besitos = n === 1 ? RECOMPENSAS_MASCOTA.cocinar : 0;
+  if (n <= 3) besitos += medalla === 'oro' ? 4 : medalla === 'plata' ? 2 : 0;
   if (besitos) await ganar('cocina', besitos).catch(() => {});
   return { ok: true, besitos, plato: item(r.resultado) };
 }

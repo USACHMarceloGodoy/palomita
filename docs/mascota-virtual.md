@@ -6,9 +6,13 @@ herramienta de patrones propios.
 
 ## Dónde está en la app
 
-- **Pestaña `Mascota`** (`app/(tabs)/mascota.tsx`): la casa. Habitación con la mascota, las tres
-  barras (hambre, higiene, afecto), saldo de besitos, botones Alimentar / Bañar / Acariciar / Vestir
-  y los regalos que dejó la pareja.
+- **Pestaña `Mascota`** (`app/(tabs)/mascota.tsx`): la casa. Habitación actual (con flechas para
+  pasar de una a otra), la mascota, las tres barras (hambre, higiene, afecto), saldo de besitos,
+  botones Alimentar / Bañar / Acariciar / Vestir y los regalos que dejó la pareja.
+- **Cuidar** (`app/mascota/cuidar.tsx?modo=`): todo con gestos. *Acariciar* es pasar el dedo sobre ella
+  (un toque no cuenta; salen corazones). *Alimentar* es arrastrar la comida desde la bandeja hasta la
+  boca. *Bañar* es tomar el jabón del piso, frotarlo sobre ella hasta llenar la espuma, y después
+  sostener la manguera encima para enjuagar.
 - **Menú hamburguesa** (`components/mascota/MenuMascota.tsx`): botón redondo en la esquina inferior
   derecha, 16 px por encima del footer, que despliega hacia arriba: Tienda, Armario, Decorar la casa,
   Personalizar mascota, Cocina, Estadio, Pesca, Árbol de la amistad, Museo de Sócrates, Visitar a tu
@@ -16,6 +20,46 @@ herramienta de patrones propios.
 - **Subpantallas** en `app/mascota/*.tsx` (pila propia con flecha de volver). Son pantallas y no
   modales por la lección de la granja: los gestos no llegan dentro de un `<Modal>` en Android. Los
   pocos modales que quedan (elegir comida, baño de burbujas, regalos) son solo toques (`Pressable`).
+
+## La casa: varias habitaciones y muebles arrastrables
+
+- `decoracion.habitaciones[]`: cada una con `tipo` (sala, dormitorio, cocina, baño, jardín, terraza,
+  ático), `pared`, `suelo` y `muebles: [{ id, x, y }]` en coordenadas 0-1 del lienzo. La sala viene
+  de regalo; las demás se compran en la tienda (pestaña Habitaciones) y se "construyen" en Decorar.
+- **Decorar** (`app/mascota/decorar.tsx`): los muebles se sueltan desde la bandeja dentro de la
+  habitación y se arrastran con el dedo (`react-native-gesture-handler` + Reanimated, patrón del
+  laberinto). Tirar un mueble hacia abajo, fuera de la habitación, lo saca. Cada unidad comprada se
+  coloca una vez en toda la casa.
+- Jardín y terraza muestran cielo en vez de pared; el ático tiene techo inclinado; el baño, azulejos.
+- Las decoraciones guardadas con el formato viejo (`{pared, suelo, muebles: string[]}`) se convierten
+  al leer (`normalizarDecoracion`), sin migración.
+
+## Minijuegos con mecánica
+
+- **Pesca** (`components/mascota/MinijuegoPesca.tsx`), estilo Stardew Valley: al enganchar aparece
+  una pista vertical con el pez moviéndose solo y una barra verde que sube mientras se mantiene
+  apretado y cae al soltar (rebota en el fondo salvo con plomada). Si el pez está dentro del verde el
+  medidor sube; si no, baja. Lleno = captura; vacío = se escapa. Física en worklets
+  (`useFrameCallback`). Cada pez tiene `comportamiento` (suave, de fondo, dardo, escurridizo, mixto)
+  y `dificultad` 1-5. Captura **perfecta** (nunca salió del verde) = ×2.4 de experiencia y +3
+  besitos. A veces aparece un **cofre**: mantener la barra sobre él llena una barra secundaria; si
+  luego se completa la captura, se conservan pez y cofre (ingrediente, insecto o cebo, +6 besitos).
+  **Nivel** = `floor(sqrt(xp/30))` (guardado en `minijuego_puntajes`, `juego = 'pesca_xp'`); cada
+  nivel agranda la barra 4,5 %. **Cañas** (bambú, fibra +15 %, iridio +30 % y drenaje ×0,8) y
+  **aparejos** (corcho +20 % barra, plomada sin rebote, anzuelo trampa drenaje ×0,6) se compran en la
+  tienda y se aplican solos.
+- **Estadio**: además de tocar, cada 1,2-2,4 s aparece una flecha y hay que deslizar hacia arriba o
+  hacia abajo dentro de 1,2 s, como un juego de ritmo. Acierto: +9 de avance; tarde o al revés:
+  tropezón (−4).
+- **Cocina** (`app/mascota/cocinar.tsx` + `components/mascota/PasosCocina.tsx`), estilo Cooking
+  Mama: cada receta son 3-4 pasos con su mecánica y su tiempo: *cortar* (deslizar hacia abajo sobre
+  las líneas punteadas), *picar* (tocar al ritmo cuando el marcador pasa por el centro), *mezclar*
+  (círculos parejos; muy rápido salpica), *voltear* (deslizar hacia arriba cuando está dorado; tarde
+  = quemado), *fuego* (perilla que sigue la zona de temperatura), *verter* (mantener y soltar en la
+  línea) y *emplatar* (arrastrar cada pieza a su punto). Cada paso da 0-100 → bronce / plata / oro;
+  la medalla final es el promedio y queda en el inventario. Si algo se quema, "Palomita lo arregla"
+  y el paso queda en bronce. Oro/plata dan besitos extra las primeras tres recetas del día.
+  18 recetas en `RECETAS`.
 
 ## Arte: todo vector, nada de PNG ni emoji
 
@@ -48,8 +92,9 @@ herramienta de patrones propios.
 
 - Los dos leen todo (para las visitas); cada uno escribe lo suyo. Las necesidades de la pareja se
   pueden subir (acariciar / alimentar en la visita).
-- El **catálogo** vive en `lib/mascota-virtual/catalogo.ts`: ~100 ítems curados. Ropa y muebles
-  rotan por semana (hash del id + número de semana); los de temporada solo aparecen en su evento.
+- El **catálogo** vive en `lib/mascota-virtual/catalogo.ts`: ~300 ítems (variantes de color de un
+  mismo dibujo son ítems distintos: `variantes()`). Ropa, muebles, paredes y pisos rotan por semana
+  (hash del id + número de semana, 4 de cada 5 visibles); los de temporada solo en su evento.
 - **Moneda**: los besitos de siempre (`economia`). Orígenes nuevos: `mascota:alimentar`,
   `mascota:banar`, `mascota:acariciar`, `mascota:vender`, `tienda:mascota`, `pesca`, `estadio`,
   `arbol`, `cocina`, `museo`, `visita`. El tope diario de 60 lo sigue aplicando el trigger.

@@ -1,51 +1,36 @@
 // Cocina: combinar ingredientes de la despensa en un plato. Los platos alimentan
 // más que la comida de la tienda y se pueden regalar a la mascota del otro.
-import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Pantalla } from '@/components/Pantalla';
 import { Texto } from '@/components/Texto';
 import { BotonKawaii } from '@/components/BotonKawaii';
-import { Particulas } from '@/components/Particulas';
 import { Cabecera } from '@/components/mascota/Cabecera';
 import { IconoItem } from '@/components/mascota/IconosMascota';
-import { cocinar } from '@/lib/mascota-virtual/acciones';
 import { item, RECETAS } from '@/lib/mascota-virtual/catalogo';
 import type { Item } from '@/lib/mascota-virtual/tipos';
 import { useMascota } from '@/lib/mascota-virtual/useMascota';
 import { colores, sombras } from '@/lib/tema';
 
+const NOMBRE_PASO = { cortar: 'cortar', picar: 'picar', mezclar: 'mezclar', voltear: 'voltear', fuego: 'fuego', verter: 'verter', emplatar: 'emplatar' } as const;
+
 export default function Cocina() {
   const router = useRouter();
   const { rol, saldo, inventario, cantidad, recargar } = useMascota();
-  const [hecho, setHecho] = useState<{ plato: Item; besitos: number } | null>(null);
-  const [festejo, setFestejo] = useState(false);
 
   const despensa = inventario.map((i) => ({ it: item(i.item_id), n: i.cantidad })).filter((x): x is { it: Item; n: number } => !!x.it && x.it.categoria === 'ingrediente');
   const platos = inventario.map((i) => ({ it: item(i.item_id), n: i.cantidad })).filter((x): x is { it: Item; n: number } => !!x.it && x.it.categoria === 'plato');
 
-  async function preparar(recetaId: string) {
-    const r = await cocinar(rol, recetaId).catch((): { ok: boolean; besitos: number; plato?: Item } => ({ ok: false, besitos: 0 }));
-    if (!r.ok || !r.plato) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    setHecho({ plato: r.plato, besitos: r.besitos });
-    setFestejo(true); setTimeout(() => setFestejo(false), 2200);
-    recargar();
+  // Cada receta se juega por pasos (cortar, mezclar, fuego...) en su pantalla.
+  function preparar(recetaId: string) {
+    Haptics.selectionAsync().catch(() => {});
+    router.push(`/mascota/cocinar?receta=${recetaId}`);
   }
 
   return (
     <Pantalla fondo={colores.rosaBase}>
-      {festejo ? <Particulas tipo="comida" densidad={14} duracion={2000} /> : null}
-      <Cabecera titulo="Cocina" saldo={saldo} subtitulo="Los ingredientes se compran en la tienda o caen del árbol." />
-
-      {hecho ? (
-        <View style={estilos.resultado}>
-          <IconoItem item={hecho.plato} size={64} />
-          <Texto variante="titulo">{hecho.plato.nombre}, listo</Texto>
-          <Texto variante="apoyo" style={{ textAlign: 'center' }}>+{hecho.plato.efecto?.hambre} hambre · +{hecho.plato.efecto?.afecto} afecto al servirlo{hecho.besitos ? ` · +${hecho.besitos} besitos` : ''}</Texto>
-        </View>
-      ) : null}
+      <Cabecera titulo="Cocina" saldo={saldo} subtitulo="Cada receta se cocina por pasos: cortar, mezclar, fuego…" />
 
       <Texto variante="etiqueta">Recetas</Texto>
       {RECETAS.map((r) => {
@@ -56,6 +41,7 @@ export default function Cocina() {
             <IconoItem item={plato} size={48} />
             <View style={{ flex: 1, gap: 4 }}>
               <Texto variante="cuerpoBold">{r.nombre}</Texto>
+              <Texto variante="apoyo" style={{ fontSize: 11 }}>{r.pasos.map((p) => NOMBRE_PASO[p.tipo]).join(' → ')}</Texto>
               <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
                 {r.ingredientes.map((ing, k) => (
                   <View key={`${ing}${k}`} style={[estilos.ingrediente, cantidad(ing) < 1 && { backgroundColor: colores.rosaBase }]}>
